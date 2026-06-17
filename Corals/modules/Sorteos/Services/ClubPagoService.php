@@ -30,7 +30,7 @@ class ClubPagoService
     /**
      * Create a payment reference in ClubPago and return the payment URL.
      */
-    public function initiatePayment(Order $order): array
+    public function initiatePayment(Order $order, ?string $returnUrl = null): array
     {
         $reference = $this->generateReference($order);
 
@@ -44,7 +44,7 @@ class ClubPagoService
             'buyer_email'  => $order->buyer_email,
             'buyer_phone'  => $order->buyer_phone,
             'callback_url' => route('sorteos.webhook.clubpago'),
-            'return_url'   => url(config('sorteos.models.order.resource_url') . '/' . $order->hashed_id),
+            'return_url'   => $returnUrl ?? url(config('sorteos.models.order.resource_url') . '/' . $order->hashed_id),
         ];
 
         $response = Http::withHeaders([
