@@ -10,11 +10,19 @@ use Corals\Modules\Sorteos\Models\Sorteo;
 use Corals\Modules\Sorteos\Services\CarteraService;
 use Corals\Modules\Sorteos\Services\ClubPagoService;
 use Illuminate\Http\Request;
-use Illuminate\Routing\Controller;
 
-class PublicSorteoController extends Controller
+class PublicSorteoController extends \Corals\Foundation\Http\Controllers\PublicBaseController
 {
-    public function __construct(private ClubPagoService $clubPago) {}
+    public function __construct(private ClubPagoService $clubPago)
+    {
+        parent::__construct();
+    }
+
+    public function index()
+    {
+        $sorteos = Sorteo::where('status', 'active')->latest()->get();
+        return view('Sorteos::public.sorteos_list', compact('sorteos'));
+    }
 
     public function show(string $slug)
     {
