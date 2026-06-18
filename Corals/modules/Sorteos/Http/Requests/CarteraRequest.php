@@ -3,12 +3,14 @@
 namespace Corals\Modules\Sorteos\Http\Requests;
 
 use Corals\Foundation\Http\Requests\BaseRequest;
+use Corals\Modules\Sorteos\Models\Cartera;
 use Illuminate\Validation\Rule;
 
 class CarteraRequest extends BaseRequest
 {
     public function authorize(): bool
     {
+        $this->setModel(Cartera::class);
         return $this->isAuthorized();
     }
 

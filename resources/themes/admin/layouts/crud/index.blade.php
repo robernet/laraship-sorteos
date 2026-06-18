@@ -20,13 +20,14 @@
 @section('title', $title)
 
 @section('actions')
-    @if(!empty($dataTable->bulkActions()))
-        {!! $dataTable->bulkActions() !!}
-    @endif
-
-    @if(!empty($dataTable->filters()))
-        {!! CoralsForm::link('#'.$dataTable->getTableAttributes()['id'].'_filtersCollapse',trans('Corals::labels.filter_open'),['class'=>'btn btn-info','data'=>['toggle'=>"collapse"]]) !!}
-    @endif
+    @isset($dataTable)
+        @if(!empty($dataTable->bulkActions()))
+            {!! $dataTable->bulkActions() !!}
+        @endif
+        @if(!empty($dataTable->filters()))
+            {!! CoralsForm::link('#'.$dataTable->getTableAttributes()['id'].'_filtersCollapse',trans('Corals::labels.filter_open'),['class'=>'btn btn-info','data'=>['toggle'=>"collapse"]]) !!}
+        @endif
+    @endisset
     @unless(isset($hideCreate))
         {!! CoralsForm::link(url($resource_url.'/create'), trans('Corals::labels.create'),['class'=>'btn btn-success']) !!}
     @endunless
@@ -71,7 +72,8 @@
 @endsection
 
 @section('js')
-
-    {!! $dataTable->assets() !!}
-    {!! $dataTable->scripts() !!}
+    @isset($dataTable)
+        {!! $dataTable->assets() !!}
+        {!! $dataTable->scripts() !!}
+    @endisset
 @endsection

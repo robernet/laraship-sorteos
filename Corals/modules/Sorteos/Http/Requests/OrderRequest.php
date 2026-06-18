@@ -4,11 +4,13 @@ namespace Corals\Modules\Sorteos\Http\Requests;
 
 use Corals\Foundation\Http\Requests\BaseRequest;
 use Corals\Modules\Sorteos\Enums\PaymentMethod;
+use Corals\Modules\Sorteos\Models\Order;
 
 class OrderRequest extends BaseRequest
 {
     public function authorize(): bool
     {
+        $this->setModel(Order::class);
         return $this->isAuthorized();
     }
 
