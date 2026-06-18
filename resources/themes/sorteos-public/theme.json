@@ -1,0 +1,8 @@
+{
+  "type": "frontend",
+  "name": "sorteos-public",
+  "extends": "corals-basic",
+  "caption": "Sorteos ITSON Public",
+  "version": "1.0",
+  "assetPath": "assets\/themes\/sorteos-public"
+}

@@ -1,0 +1,511 @@
+/* =========================================================
+   Sorteos ITSON — Public Theme
+   ========================================================= */
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+
+/* ---------------------------------------------------------
+   1. Design Tokens
+   --------------------------------------------------------- */
+:root {
+  --c-primary:      #1a3a6e;
+  --c-primary-dark: #122a52;
+  --c-primary-light:#2a5298;
+  --c-accent:       #f59e0b;
+  --c-accent-dark:  #d97706;
+  --c-success:      #10b981;
+  --c-success-bg:   #d1fae5;
+  --c-success-text: #065f46;
+  --c-warning-bg:   #fef3c7;
+  --c-warning-text: #92400e;
+  --c-danger:       #ef4444;
+  --c-danger-bg:    #fee2e2;
+  --c-danger-text:  #991b1b;
+  --c-bg:           #f1f5f9;
+  --c-surface:      #ffffff;
+  --c-border:       #e2e8f0;
+  --c-text:         #1e293b;
+  --c-muted:        #64748b;
+  --c-subtle:       #94a3b8;
+  --radius-sm:      6px;
+  --radius-md:      12px;
+  --radius-pill:    9999px;
+  --shadow-sm:      0 1px 3px rgba(0,0,0,.08);
+  --shadow-md:      0 4px 16px rgba(0,0,0,.08);
+  --font:           'Inter', system-ui, -apple-system, sans-serif;
+  --transition:     .18s ease;
+  --container:      640px;
+}
+
+/* ---------------------------------------------------------
+   2. Base
+   --------------------------------------------------------- */
+*, *::before, *::after { box-sizing: border-box; }
+
+body.sorteos-page {
+  font-family:            var(--font);
+  background:             var(--c-bg);
+  color:                  var(--c-text);
+  font-size:              15px;
+  line-height:            1.6;
+  -webkit-font-smoothing: antialiased;
+  margin:                 0;
+  min-height:             100vh;
+  display:                flex;
+  flex-direction:         column;
+}
+
+body.sorteos-page a { color: var(--c-primary); text-decoration: none; }
+body.sorteos-page a:hover { text-decoration: underline; }
+
+/* ---------------------------------------------------------
+   3. Navbar
+   --------------------------------------------------------- */
+.srt-nav {
+  background:      var(--c-primary);
+  padding:         0 24px;
+  height:          60px;
+  display:         flex;
+  align-items:     center;
+  justify-content: space-between;
+  position:        sticky;
+  top:             0;
+  z-index:         100;
+  box-shadow:      0 2px 8px rgba(0,0,0,.2);
+}
+.srt-nav__brand {
+  display:         flex;
+  align-items:     center;
+  gap:             10px;
+  color:           #fff;
+  font-size:       17px;
+  font-weight:     800;
+  letter-spacing:  -.3px;
+}
+.srt-nav__brand:hover { color: #fff; text-decoration: none; }
+.srt-nav__brand-badge {
+  background:    var(--c-accent);
+  color:         #fff;
+  font-size:     10px;
+  font-weight:   700;
+  padding:       2px 7px;
+  border-radius: var(--radius-pill);
+  letter-spacing:.3px;
+}
+.srt-nav__links { display: flex; gap: 20px; align-items: center; }
+.srt-nav__links a {
+  color:       rgba(255,255,255,.75);
+  font-size:   13px;
+  font-weight: 500;
+  transition:  color var(--transition);
+}
+.srt-nav__links a:hover { color: #fff; text-decoration: none; }
+
+/* ---------------------------------------------------------
+   4. Cover / Hero
+   --------------------------------------------------------- */
+.srt-cover {
+  position:   relative;
+  width:      100%;
+  max-height: 320px;
+  overflow:   hidden;
+}
+.srt-cover img {
+  width:       100%;
+  height:      320px;
+  object-fit:  cover;
+  display:     block;
+}
+.srt-cover__overlay {
+  position:   absolute;
+  inset:      0;
+  background: linear-gradient(to top, rgba(18,42,82,.85) 0%, transparent 55%);
+}
+.srt-cover__text {
+  position:  absolute;
+  bottom:    24px;
+  left:      50%;
+  transform: translateX(-50%);
+  text-align:center;
+  color:     #fff;
+  width:     90%;
+}
+.srt-cover__text h1 {
+  font-size:   24px;
+  font-weight: 800;
+  margin:      0 0 4px;
+  text-shadow: 0 2px 6px rgba(0,0,0,.4);
+}
+.srt-cover__text p { font-size: 13px; opacity: .85; margin: 0; }
+
+.srt-hero {
+  background: var(--c-primary);
+  padding:    26px 24px;
+  text-align: center;
+  color:      #fff;
+}
+.srt-hero h1 { font-size: 22px; font-weight: 800; margin: 0 0 4px; }
+.srt-hero p  { font-size: 13px; opacity: .8; margin: 0; }
+
+/* ---------------------------------------------------------
+   5. Main Container
+   --------------------------------------------------------- */
+.srt-main { flex: 1; }
+.srt-container {
+  max-width: var(--container);
+  margin:    0 auto;
+  padding:   24px 16px 56px;
+}
+
+/* ---------------------------------------------------------
+   6. Stats Bar
+   --------------------------------------------------------- */
+.srt-stats {
+  display:               grid;
+  grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
+  gap:                   1px;
+  background:            var(--c-border);
+  border:                1px solid var(--c-border);
+  border-radius:         var(--radius-md);
+  overflow:              hidden;
+  box-shadow:            var(--shadow-md);
+  margin-bottom:         20px;
+}
+.srt-stat {
+  background: var(--c-surface);
+  text-align: center;
+  padding:    16px 8px;
+}
+.srt-stat__label {
+  font-size:      10px;
+  font-weight:    600;
+  color:          var(--c-muted);
+  text-transform: uppercase;
+  letter-spacing: .5px;
+}
+.srt-stat__value {
+  font-size:   22px;
+  font-weight: 800;
+  color:       var(--c-primary);
+  line-height: 1.2;
+  margin-top:  3px;
+}
+
+/* ---------------------------------------------------------
+   7. Card
+   --------------------------------------------------------- */
+.srt-card {
+  background:    var(--c-surface);
+  border-radius: var(--radius-md);
+  padding:       22px;
+  box-shadow:    var(--shadow-md);
+  margin-bottom: 16px;
+}
+.srt-card__title {
+  font-size:     14px;
+  font-weight:   700;
+  color:         var(--c-primary);
+  margin:        0 0 16px;
+  padding-bottom:10px;
+  border-bottom: 2px solid var(--c-border);
+  display:       flex;
+  align-items:   center;
+  gap:           7px;
+}
+.srt-card__title i { color: var(--c-accent); }
+
+/* ---------------------------------------------------------
+   8. Step Indicator
+   --------------------------------------------------------- */
+.srt-steps {
+  display:       flex;
+  align-items:   center;
+  margin-bottom: 22px;
+}
+.srt-step {
+  display:     flex;
+  align-items: center;
+  flex:        1;
+}
+.srt-step__dot {
+  width:           26px;
+  height:          26px;
+  border-radius:   50%;
+  background:      var(--c-border);
+  color:           var(--c-muted);
+  font-size:       11px;
+  font-weight:     700;
+  display:         flex;
+  align-items:     center;
+  justify-content: center;
+  flex-shrink:     0;
+  transition:      background var(--transition);
+}
+.srt-step.active .srt-step__dot { background: var(--c-primary); color: #fff; }
+.srt-step.done   .srt-step__dot { background: var(--c-success);  color: #fff; }
+.srt-step__label {
+  font-size:   11px;
+  font-weight: 600;
+  color:       var(--c-muted);
+  margin-left: 6px;
+}
+.srt-step.active .srt-step__label { color: var(--c-primary); }
+.srt-step__line {
+  flex:       1;
+  height:     2px;
+  background: var(--c-border);
+  margin:     0 6px;
+}
+
+/* ---------------------------------------------------------
+   9. Tabs
+   --------------------------------------------------------- */
+.srt-tabs {
+  display:       flex;
+  border:        1.5px solid var(--c-border);
+  border-radius: var(--radius-sm);
+  overflow:      hidden;
+  margin-bottom: 16px;
+}
+.srt-tab {
+  flex:        1;
+  padding:     9px;
+  text-align:  center;
+  font-size:   13px;
+  font-weight: 500;
+  color:       var(--c-muted);
+  background:  #f8fafc;
+  cursor:      pointer;
+  border:      none;
+  font-family: var(--font);
+  transition:  background var(--transition), color var(--transition);
+}
+.srt-tab + .srt-tab { border-left: 1.5px solid var(--c-border); }
+.srt-tab.active { background: var(--c-primary); color: #fff; font-weight: 600; }
+.srt-tab-pane   { display: none; }
+.srt-tab-pane.active { display: block; }
+
+/* ---------------------------------------------------------
+   10. Form
+   --------------------------------------------------------- */
+.srt-form-group { margin-bottom: 14px; }
+.srt-label {
+  display:     block;
+  font-size:   12px;
+  font-weight: 600;
+  color:       var(--c-text);
+  margin:      0 0 5px;
+}
+.srt-label span { color: var(--c-danger); margin-left: 2px; }
+.srt-input {
+  width:         100%;
+  padding:       10px 12px;
+  border:        1.5px solid var(--c-border);
+  border-radius: var(--radius-sm);
+  font-size:     14px;
+  font-family:   var(--font);
+  color:         var(--c-text);
+  background:    var(--c-surface);
+  transition:    border-color var(--transition), box-shadow var(--transition);
+  outline:       none;
+  appearance:    none;
+  -webkit-appearance: none;
+}
+.srt-input:focus {
+  border-color: var(--c-primary-light);
+  box-shadow:   0 0 0 3px rgba(42,82,152,.12);
+}
+.srt-input::placeholder { color: var(--c-subtle); }
+.srt-hint {
+  font-size:  11px;
+  color:      var(--c-muted);
+  margin-top: 4px;
+}
+.srt-form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap:     12px;
+}
+.srt-divider {
+  border:     none;
+  border-top: 1.5px solid var(--c-border);
+  margin:     18px 0;
+}
+
+/* ---------------------------------------------------------
+   11. Buttons
+   --------------------------------------------------------- */
+.srt-btn {
+  display:         inline-flex;
+  align-items:     center;
+  justify-content: center;
+  gap:             8px;
+  padding:         12px 20px;
+  border:          none;
+  border-radius:   var(--radius-sm);
+  font-size:       15px;
+  font-weight:     700;
+  font-family:     var(--font);
+  cursor:          pointer;
+  transition:      background var(--transition), box-shadow var(--transition), transform var(--transition);
+  text-decoration: none;
+}
+.srt-btn:hover   { text-decoration: none; }
+.srt-btn:active  { transform: translateY(1px); }
+
+.srt-btn--primary {
+  background:  var(--c-primary);
+  color:       #fff;
+  width:       100%;
+  box-shadow:  0 2px 8px rgba(26,58,110,.3);
+}
+.srt-btn--primary:hover { background: var(--c-primary-dark); color: #fff; box-shadow: 0 4px 14px rgba(26,58,110,.4); }
+
+.srt-btn--ghost {
+  background:  transparent;
+  color:       var(--c-primary);
+  border:      1.5px solid var(--c-primary);
+}
+.srt-btn--ghost:hover { background: rgba(26,58,110,.05); color: var(--c-primary); }
+
+.srt-btn--sm { font-size: 13px; padding: 7px 14px; }
+
+/* ---------------------------------------------------------
+   12. Alerts
+   --------------------------------------------------------- */
+.srt-alert {
+  padding:       12px 15px;
+  border-radius: var(--radius-sm);
+  font-size:     13px;
+  margin-bottom: 16px;
+  display:       flex;
+  align-items:   flex-start;
+  gap:           9px;
+}
+.srt-alert i    { margin-top: 1px; flex-shrink: 0; }
+.srt-alert--success { background: var(--c-success-bg); color: var(--c-success-text); }
+.srt-alert--warning { background: var(--c-warning-bg); color: var(--c-warning-text); }
+.srt-alert--danger  { background: var(--c-danger-bg);  color: var(--c-danger-text);  }
+.srt-alert--info    { background: #eff6ff;             color: #1d4ed8; }
+
+/* ---------------------------------------------------------
+   13. Badge
+   --------------------------------------------------------- */
+.srt-badge {
+  display:       inline-flex;
+  align-items:   center;
+  gap:           5px;
+  padding:       5px 12px;
+  border-radius: var(--radius-pill);
+  font-size:     12px;
+  font-weight:   700;
+}
+.srt-badge--confirmed { background: var(--c-success-bg); color: var(--c-success-text); }
+.srt-badge--pending   { background: var(--c-warning-bg); color: var(--c-warning-text); }
+.srt-badge--cancelled { background: var(--c-danger-bg);  color: var(--c-danger-text);  }
+
+/* ---------------------------------------------------------
+   14. Info Rows
+   --------------------------------------------------------- */
+.srt-info-row {
+  display:         flex;
+  justify-content: space-between;
+  align-items:     center;
+  font-size:       13px;
+  padding:         8px 0;
+  border-bottom:   1px solid var(--c-border);
+}
+.srt-info-row:last-child    { border-bottom: none; }
+.srt-info-row__label        { color: var(--c-muted); }
+.srt-info-row__value        { font-weight: 600; }
+.srt-info-row__value--total { font-size: 17px; font-weight: 800; color: var(--c-primary); }
+
+/* ---------------------------------------------------------
+   15. Ticket Table
+   --------------------------------------------------------- */
+.srt-table {
+  width:           100%;
+  border-collapse: collapse;
+  font-size:       13px;
+}
+.srt-table th {
+  background:     #f1f5f9;
+  color:          var(--c-primary);
+  font-weight:    700;
+  text-align:     left;
+  padding:        8px 12px;
+  font-size:      11px;
+  text-transform: uppercase;
+  letter-spacing: .5px;
+}
+.srt-table td {
+  padding:       8px 12px;
+  border-bottom: 1px solid var(--c-border);
+}
+.srt-table tr:last-child td { border-bottom: none; }
+.srt-ticket-num {
+  font-family:   monospace;
+  font-size:     14px;
+  font-weight:   700;
+  color:         var(--c-primary);
+  background:    #eef2ff;
+  padding:       2px 7px;
+  border-radius: 4px;
+  letter-spacing:.5px;
+}
+
+/* ---------------------------------------------------------
+   16. Trust Strip
+   --------------------------------------------------------- */
+.srt-trust {
+  display:         flex;
+  gap:             16px;
+  justify-content: center;
+  flex-wrap:       wrap;
+  margin-top:      18px;
+  padding-top:     16px;
+  border-top:      1px solid var(--c-border);
+}
+.srt-trust__item {
+  display:     flex;
+  align-items: center;
+  gap:         5px;
+  font-size:   11px;
+  font-weight: 600;
+  color:       var(--c-muted);
+}
+.srt-trust__item i { color: var(--c-success); font-size: 12px; }
+
+/* ---------------------------------------------------------
+   17. Footer
+   --------------------------------------------------------- */
+.srt-footer {
+  background:  var(--c-primary-dark);
+  color:       rgba(255,255,255,.55);
+  text-align:  center;
+  padding:     18px 24px;
+  font-size:   12px;
+}
+.srt-footer a { color: rgba(255,255,255,.7); }
+.srt-footer a:hover { color: #fff; text-decoration: none; }
+.srt-footer__links {
+  display:       flex;
+  gap:           18px;
+  justify-content: center;
+  margin-bottom: 6px;
+  flex-wrap:     wrap;
+}
+
+/* ---------------------------------------------------------
+   18. Responsive
+   --------------------------------------------------------- */
+@media (max-width: 520px) {
+  .srt-cover img          { height: 200px; }
+  .srt-cover__text h1     { font-size: 19px; }
+  .srt-card               { padding: 16px 14px; }
+  .srt-form-row           { grid-template-columns: 1fr; }
+  .srt-step__label        { display: none; }
+  .srt-stat__value        { font-size: 18px; }
+  .srt-nav__links         { display: none; }
+  .srt-trust              { gap: 10px; }
+}
