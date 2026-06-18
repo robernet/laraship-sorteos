@@ -38,22 +38,12 @@ class SorteosServiceProvider extends BasePackageServiceProvider
             }
 
             $boletoDigital = app(\Corals\Modules\Sorteos\Services\BoletoDigitalService::class);
-            $brevo         = app(\Corals\Modules\Sorteos\Services\BrevoMailService::class);
 
-            $order->loadMissing(['sorteo', 'items.boleto.sorteo', 'items.boleto.cartera']);
+            $order->loadMissing(['items.boleto']);
 
-            // Pre-generate anti-fraud tokens for all boletos
             foreach ($order->items as $item) {
                 if ($item->boleto) {
                     $boletoDigital->getOrCreateToken($item->boleto);
-                }
-            }
-
-            // Send confirmation email with PDF attachments
-            if ($brevo->isConfigured()) {
-                $result = $brevo->sendOrderConfirmation($order, $boletoDigital);
-                if (!$result['sent']) {
-                    \Log::warning('Brevo confirmation email failed for order ' . $order->id, ['error' => $result['error']]);
                 }
             }
         }, 10);
