@@ -32,9 +32,7 @@ class SorteosServiceProvider extends BasePackageServiceProvider
 
     protected function registerHooks(): void
     {
-        \Actions::add_action('order.confirmed', function (array $args) {
-            /** @var \Corals\Modules\Sorteos\Models\Order $order */
-            $order = $args[0] ?? null;
+        \Actions::add_action('order.confirmed', function ($order) {
             if (!$order) {
                 return;
             }

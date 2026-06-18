@@ -14,6 +14,8 @@ use Illuminate\Http\Request;
 
 class BoletosController extends BaseController
 {
+    protected $corals_middleware_except = ['validateTicket', 'resendForm', 'resendByEmail'];
+
     public function __construct(
         protected BoletoService $boletoService,
         protected BoletoDigitalService $boletoDigital

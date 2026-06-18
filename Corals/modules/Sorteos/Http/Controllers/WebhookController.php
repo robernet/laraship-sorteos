@@ -2,43 +2,20 @@
 
 namespace Corals\Modules\Sorteos\Http\Controllers;
 
-use Corals\Foundation\Http\Controllers\BaseController;
 use Corals\Modules\Sorteos\Models\Order;
 use Corals\Modules\Sorteos\Services\ClubPagoService;
 use Corals\Modules\Sorteos\Services\OrderService;
 use Illuminate\Http\Request;
+use Illuminate\Routing\Controller;
 
-class PaymentsController extends BaseController
+class WebhookController extends Controller
 {
-    protected $corals_middleware_except = ['webhook'];
-
     public function __construct(
         private ClubPagoService $clubPago,
         private OrderService $orderService
-    ) {
-        $this->resource_url = config('sorteos.models.order.resource_url');
-        parent::__construct();
-    }
+    ) {}
 
-    /**
-     * Initiate a ClubPago payment for the given order and redirect the admin to the payment URL.
-     */
-    public function initiate(Request $request, Order $order)
-    {
-        try {
-            $result = $this->clubPago->initiatePayment($order);
-            return redirect()->away($result['payment_url']);
-        } catch (\Exception $e) {
-            log_exception($e, Order::class, 'initiatePayment');
-            flash($e->getMessage())->error();
-            return redirect()->back();
-        }
-    }
-
-    /**
-     * Receive and process ClubPago webhook notifications (public, no CSRF/auth).
-     */
-    public function webhook(Request $request)
+    public function handle(Request $request)
     {
         if (!$this->clubPago->validateWebhookSignature($request)) {
             return response()->json(['error' => 'Invalid signature'], 400);

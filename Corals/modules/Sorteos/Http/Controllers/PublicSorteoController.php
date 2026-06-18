@@ -103,10 +103,7 @@ class PublicSorteoController extends Controller
 
     public function orderStatus(string $hashedId)
     {
-        $decoded = hashids()->decode($hashedId);
-        $order   = isset($decoded[0])
-            ? Order::with(['sorteo', 'items.boleto'])->find($decoded[0])
-            : null;
+        $order = Order::with(['sorteo', 'items.boleto'])->find(hashids_decode($hashedId));
 
         return view('Sorteos::public.order_status', compact('order'));
     }

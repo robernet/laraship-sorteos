@@ -30,3 +30,11 @@ Route::group(['prefix' => ''], function () {
     Route::post('sorteos/{sorteo}/change-status/{status}', 'SorteosController@changeStatus')
         ->name('sorteos.change-status');
 });
+
+// Public buyer-facing routes (no auth required, need web sessions)
+Route::get('boleto/{token}/validate', 'BoletosController@validateTicket')->name('sorteos.boleto.validate');
+Route::get('mis-boletos/reenviar', 'BoletosController@resendForm')->name('sorteos.boletos.resend-form');
+Route::post('mis-boletos/reenviar', 'BoletosController@resendByEmail')->name('sorteos.boletos.resend-email');
+Route::get('sorteo/{slug}', 'PublicSorteoController@show')->name('sorteos.public.show');
+Route::post('sorteo/{slug}/comprar', 'PublicSorteoController@checkout')->name('sorteos.public.checkout');
+Route::get('orden/{hashedId}', 'PublicSorteoController@orderStatus')->name('sorteos.public.order');

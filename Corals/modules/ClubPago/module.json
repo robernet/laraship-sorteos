@@ -1,0 +1,17 @@
+{
+  "code": "corals-clubpago",
+  "name": "Club Pago Terminal Gateway",
+  "author": "RPM",
+  "type": "payment",
+  "description": "Terminal/POS payment gateway — customers pay at OXXO/7-Eleven via a ClubPago reference number",
+  "namespace": "Corals\\Modules\\ClubPago",
+  "provider": "ClubPagoServiceProvider",
+  "version": "2.0",
+  "folder": "ClubPago",
+  "autoload": "psr-4",
+  "icon": "fa fa-money",
+  "require": {},
+  "supported_platforms": [
+    "Sorteos"
+  ]
+}
