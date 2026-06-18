@@ -102,11 +102,13 @@ class SorteosTables extends Migration
      */
     public function down()
     {
+        Schema::disableForeignKeyConstraints();
         Schema::dropIfExists('sorteos_order_items');
         Schema::dropIfExists('sorteos_orders');
         Schema::dropIfExists('sorteos_boletos');
         Schema::dropIfExists('sorteos_carteras');
         Schema::dropIfExists('sorteos_sorteos');
+        Schema::enableForeignKeyConstraints();
     }
 
     protected function commonColumns(Blueprint $table)
