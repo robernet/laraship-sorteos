@@ -2,7 +2,7 @@
   "code": "corals-clubpago",
   "name": "Club Pago Terminal Gateway",
   "author": "RPM",
-  "type": "payment",
+  "type": "module",
   "description": "Terminal/POS payment gateway — customers pay at OXXO/7-Eleven via a ClubPago reference number",
   "namespace": "Corals\\Modules\\ClubPago",
   "provider": "ClubPagoServiceProvider",
