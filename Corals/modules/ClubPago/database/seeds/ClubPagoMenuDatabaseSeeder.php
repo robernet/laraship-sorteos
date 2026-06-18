@@ -2,53 +2,30 @@
 
 namespace Corals\Modules\ClubPago\database\seeds;
 
-use Corals\Menu\Models\Menu;
 use Illuminate\Database\Seeder;
 
 class ClubPagoMenuDatabaseSeeder extends Seeder
 {
-    /**
-     * Run the database seeds.
-     *
-     * @return void
-     */
-    public function run()
+    public function run(): void
     {
-        $menu_id = Menu::where('key', 'payment')->first();
-        if (!is_null($menu_id)) {
-            // seed children menu
-            \DB::table('menus')->insert([
-                    [
-                        'parent_id' => $menu_id,
-                        'key' => 'clubpago',
-                        'url' => config('clubpago.models.clubpago_reference.resource_url'),
-                        'active_menu_url' => config('clubpago.models.clubpago_reference.resource_url') . '*',
-                        'name' => 'Referencias Club Pago',
-                        'description' => 'Referencias Club Pago List Menu Item',
-                        'icon' => 'fa fa-file-pdf-o',
-                        'target' => null,
-                        'roles' => '["1","2","3"]',
-                        'order' => 10
-                    ],
-                ]
-            );
-        } else {
-            \DB::table('menus')->insert([
-                    [
-                        'parent_id' => 1,
-                        'key' => 'clubpago',
-                        'url' => config('clubpago.models.clubpago_reference.resource_url'),
-                        'active_menu_url' => config('clubpago.models.clubpago_reference.resource_url') . '*',
-                        'name' => 'Referencias Club Pago',
-                        'description' => 'Referencias Club Pago List Menu Item',
-                        'icon' => 'fa fa-file-pdf-o',
-                        'target' => null,
-                        'roles' => '["1","2","3"]',
-                        'order' => 10
-                    ],
-                ]
-            );
-
+        if (\DB::table('menus')->where('key', 'clubpago-references')->exists()) {
+            return;
         }
+
+        $sorteoParent = \DB::table('menus')->where('key', 'sorteos')->first();
+        $parentId = $sorteoParent ? $sorteoParent->id : 1;
+
+        \DB::table('menus')->insert([
+            'parent_id'       => $parentId,
+            'key'             => 'clubpago-references',
+            'url'             => config('clubpago.models.clubpago_reference.resource_url'),
+            'active_menu_url' => config('clubpago.models.clubpago_reference.resource_url') . '*',
+            'name'            => 'Referencias ClubPago',
+            'description'     => 'Referencias de pago en efectivo generadas',
+            'icon'            => 'fa fa-barcode',
+            'target'          => null,
+            'roles'           => '["1","2"]',
+            'order'           => 15,
+        ]);
     }
 }

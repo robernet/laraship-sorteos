@@ -47,7 +47,7 @@ class ClubPagoReferencesDataTable extends BaseDataTable
     {
         return [
             'id' => ['visible' => false],
-            'order_number' => ['title' => trans('ClubPago::labels.clubpago_reference.order_number')],
+            'order_id' => ['title' => trans('ClubPago::labels.clubpago_reference.order_number')],
             'amount' => ['title' => trans('ClubPago::labels.clubpago_reference.amount')],
             'reference' => ['title' => trans('ClubPago::labels.clubpago_reference.reference')],
             'folio' => ['title' => trans('ClubPago::labels.clubpago_reference.folio')],

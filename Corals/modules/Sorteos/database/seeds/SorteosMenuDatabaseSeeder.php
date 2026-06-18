@@ -9,6 +9,10 @@ class SorteosMenuDatabaseSeeder extends Seeder
 {
     public function run(): void
     {
+        if (\DB::table('menus')->where('key', 'sorteos')->exists()) {
+            return;
+        }
+
         $roleIds = $this->resolveRoleIds([
             'superadmin', 'admin',
             'sorteos_admin', 'sorteos_operator', 'sorteos_support',

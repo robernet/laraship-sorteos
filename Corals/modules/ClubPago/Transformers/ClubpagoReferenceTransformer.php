@@ -21,12 +21,14 @@ class ClubPagoReferenceTransformer extends BaseTransformer
      */
     public function transform(ClubPagoReference $clubpago_reference)
     {
-        $show_url = $clubpago_reference->getShowURL();
+        $orderId = $clubpago_reference->order_id
+            ? 'ORD-' . sprintf('%06d', $clubpago_reference->order_id)
+            : '-';
 
         $transformedArray = [
-            'id' => $clubpago_reference->id,
-            'order_number' => $clubpago_reference->order_number,
-            'amount' => \Currency::format($clubpago_reference->amount),
+            'id'       => $clubpago_reference->id,
+            'order_id' => $orderId,
+            'amount'   => \Currency::format($clubpago_reference->amount),
             'reference' => $clubpago_reference->reference,
             'folio' => $clubpago_reference->folio,
             'pay_format' => '<a target="_blank" href="' . $clubpago_reference->pay_format . '">'.trans('ClubPago::labels.clubpago_reference.pay_format').'</a>',
