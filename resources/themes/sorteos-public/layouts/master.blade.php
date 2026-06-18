@@ -8,6 +8,8 @@
     <title>@yield('title', 'Sorteos ITSON')</title>
     <link rel="shortcut icon" href="{{ \Settings::get('site_favicon') }}" type="image/png">
 
+    <link rel="stylesheet" href="{{ asset('assets/themes/admin/plugins/font-awesome/css/font-awesome.min.css') }}">
+    <link rel="stylesheet" href="{{ asset('assets/themes/admin/plugins/bootstrap/dist/css/bootstrap.min.css') }}">
     {!! Theme::css('css/sorteos.css') !!}
     {!! \Html::style('assets/corals/plugins/toastr/toastr.min.css') !!}
     {!! \Assets::css() !!}
@@ -27,6 +29,7 @@
 
     @include('partials.footer')
 
+    <script src="{{ asset('assets/themes/admin/plugins/bootstrap/dist/js/bootstrap.min.js') }}"></script>
     {!! \Html::script('assets/corals/js/corals_functions.js') !!}
     {!! \Html::script('assets/corals/js/corals_main.js') !!}
     {!! \Html::script('assets/corals/plugins/toastr/toastr.min.js') !!}
