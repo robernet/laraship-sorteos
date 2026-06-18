@@ -28,11 +28,12 @@
             {!! CoralsForm::link('#'.$dataTable->getTableAttributes()['id'].'_filtersCollapse',trans('Corals::labels.filter_open'),['class'=>'btn btn-info','data'=>['toggle'=>"collapse"]]) !!}
         @endif
     @endisset
-    @unless(isset($hideCreate))
-        {!! CoralsForm::link(url($resource_url.'/create'), trans('Corals::labels.create'),['class'=>'btn btn-success']) !!}
-    @endunless
     @isset($resourceModel)
         {!! $resourceModel->getGenericActions() !!}
+    @else
+        @unless(isset($hideCreate))
+            {!! CoralsForm::link(url($resource_url.'/create'), trans('Corals::labels.create'),['class'=>'btn btn-success']) !!}
+        @endunless
     @endisset
 @endsection
 
