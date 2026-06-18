@@ -41,6 +41,7 @@
     "php-http/message": "^1.16",
     "predis/predis": "v2.2.2",
     "psr/http-factory": "^1.0",
+    "robernet/clubpago": "dev-main",
     "spatie/image-optimizer": "^1.7.5",
     "spatie/laravel-activitylog": "^4.8.0",
     "spatie/laravel-html": "^3.11.0",
