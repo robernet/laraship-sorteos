@@ -14,13 +14,13 @@ class SorteosMenuDatabaseSeeder extends Seeder
         }
 
         $roleIds = $this->resolveRoleIds([
-            'superadmin', 'admin',
+            'superuser',
             'sorteos_admin', 'sorteos_operator', 'sorteos_support',
         ]);
 
-        $adminRoles    = $this->json($roleIds, ['superadmin', 'admin', 'sorteos_admin']);
-        $operatorRoles = $this->json($roleIds, ['superadmin', 'admin', 'sorteos_admin', 'sorteos_operator']);
-        $allRoles      = $this->json($roleIds, ['superadmin', 'admin', 'sorteos_admin', 'sorteos_operator', 'sorteos_support']);
+        $adminRoles    = $this->json($roleIds, ['superuser', 'sorteos_admin']);
+        $operatorRoles = $this->json($roleIds, ['superuser', 'sorteos_admin', 'sorteos_operator']);
+        $allRoles      = $this->json($roleIds, ['superuser', 'sorteos_admin', 'sorteos_operator', 'sorteos_support']);
 
         $parentId = \DB::table('menus')->insertGetId([
             'parent_id'       => 1,

@@ -3,6 +3,7 @@
 namespace Corals\Modules\ClubPago\database\seeds;
 
 use Illuminate\Database\Seeder;
+use Spatie\Permission\Models\Role;
 
 class ClubPagoMenuDatabaseSeeder extends Seeder
 {
@@ -15,6 +16,9 @@ class ClubPagoMenuDatabaseSeeder extends Seeder
         $sorteoParent = \DB::table('menus')->where('key', 'sorteos')->first();
         $parentId = $sorteoParent ? $sorteoParent->id : 1;
 
+        $roles = Role::whereIn('name', ['superuser', 'sorteos_admin'])->pluck('id')
+            ->map(fn($id) => (string) $id)->values()->toJson();
+
         \DB::table('menus')->insert([
             'parent_id'       => $parentId,
             'key'             => 'clubpago-references',
@@ -24,7 +28,7 @@ class ClubPagoMenuDatabaseSeeder extends Seeder
             'description'     => 'Referencias de pago en efectivo generadas',
             'icon'            => 'fa fa-barcode',
             'target'          => null,
-            'roles'           => '["1","2"]',
+            'roles'           => $roles,
             'order'           => 15,
         ]);
     }
