@@ -18,12 +18,15 @@
             @component('components.box')
                 {!! CoralsForm::openForm($order) !!}
 
-                {{-- Sorteo y método de pago --}}
+                {{-- Sorteo, Colaborador y método de pago --}}
                 <div class="row">
-                    <div class="col-md-6">
-                        {!! CoralsForm::select('sorteo_id', 'Sorteos::attributes.order.sorteo_id', $sorteos, true, $order->sorteo_id) !!}
+                    <div class="col-md-4">
+                        {!! CoralsForm::select('sorteo_id', 'Sorteos::attributes.order.sorteo_id', $sorteos, true, $order->sorteo_id, ['id' => 'sorteo_id']) !!}
                     </div>
-                    <div class="col-md-6">
+                    <div class="col-md-4">
+                        {!! CoralsForm::select('asignado_id', 'Sorteos::attributes.order.asignado_id', $asignados, false, $order->asignado_id, ['id' => 'asignado_id']) !!}
+                    </div>
+                    <div class="col-md-4">
                         {!! CoralsForm::select('payment_method', 'Sorteos::attributes.order.payment_method', $paymentMethods, true, $order->payment_method?->value) !!}
                     </div>
                 </div>
@@ -51,7 +54,6 @@
                 </div>
 
                 @if($order->exists)
-                    {{-- Edit: show assigned boletos, no re-assignment --}}
                     <div class="row">
                         <div class="col-md-12">
                             <div class="alert alert-info">
@@ -60,15 +62,45 @@
                         </div>
                     </div>
                 @else
-                    {{-- Create: boleto selection --}}
-                    <div class="row">
-                        <div class="col-md-6">
-                            {!! CoralsForm::textarea('boleto_ids_text', 'Sorteos::attributes.order.boleto_ids_text', false, null, ['rows' => 3, 'placeholder' => '1, 2, 3, 10, 25']) !!}
-                            <small class="text-muted">{{ trans('Sorteos::attributes.order.boleto_ids_hint') }}</small>
+                    {{-- Selección dinámica cuando hay colaborador --}}
+                    <div id="boleto-dynamic" style="display:none">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label>Cartera</label>
+                                    <select id="cartera-select" class="form-control">
+                                        <option value="">— Seleccionar cartera —</option>
+                                    </select>
+                                    <small class="text-muted">Carteras asignadas al colaborador</small>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label>Boletos disponibles</label>
+                                    <select id="boleto-select" name="boleto_ids[]" class="form-control" multiple size="6">
+                                        <option value="" disabled>Selecciona una cartera primero</option>
+                                    </select>
+                                    <small class="text-muted">Ctrl+clic para seleccionar varios</small>
+                                </div>
+                            </div>
                         </div>
-                        <div class="col-md-6">
-                            {!! CoralsForm::textarea('cartera_codes_text', 'Sorteos::attributes.order.cartera_codes_text', false, null, ['rows' => 3, 'placeholder' => 'A001, A002']) !!}
-                            <small class="text-muted">{{ trans('Sorteos::attributes.order.cartera_codes_hint') }}</small>
+                        <div id="no-carteras-alert" class="alert alert-warning" style="display:none">
+                            <i class="fa fa-exclamation-triangle"></i>
+                            Este colaborador no tiene carteras asignadas para el sorteo seleccionado.
+                        </div>
+                    </div>
+
+                    {{-- Selección manual sin colaborador --}}
+                    <div id="boleto-manual">
+                        <div class="row">
+                            <div class="col-md-6">
+                                {!! CoralsForm::textarea('boleto_ids_text', 'Sorteos::attributes.order.boleto_ids_text', false, null, ['rows' => 3, 'placeholder' => '1, 2, 3, 10, 25']) !!}
+                                <small class="text-muted">{{ trans('Sorteos::attributes.order.boleto_ids_hint') }}</small>
+                            </div>
+                            <div class="col-md-6">
+                                {!! CoralsForm::textarea('cartera_codes_text', 'Sorteos::attributes.order.cartera_codes_text', false, null, ['rows' => 3, 'placeholder' => 'A001, A002']) !!}
+                                <small class="text-muted">{{ trans('Sorteos::attributes.order.cartera_codes_hint') }}</small>
+                            </div>
                         </div>
                     </div>
                 @endif
@@ -92,3 +124,78 @@
         </div>
     </div>
 @endsection
+
+@if(!$order->exists)
+@push('js')
+<script>
+(function () {
+    var apiUrl    = '{{ route('sorteos.orders.carteras-by-asignado') }}';
+    var carteraEl = document.getElementById('cartera-select');
+    var boletoEl  = document.getElementById('boleto-select');
+    var dynamic   = document.getElementById('boleto-dynamic');
+    var manual    = document.getElementById('boleto-manual');
+    var noAlert   = document.getElementById('no-carteras-alert');
+
+    var carterasData = {};
+
+    function loadCarteras() {
+        var asignadoId = document.getElementById('asignado_id').value;
+        var sorteoId   = document.getElementById('sorteo_id').value;
+
+        if (!asignadoId || !sorteoId) {
+            dynamic.style.display = 'none';
+            manual.style.display  = '';
+            return;
+        }
+
+        fetch(apiUrl + '?asignado_id=' + asignadoId + '&sorteo_id=' + sorteoId, {
+            headers: { 'X-Requested-With': 'XMLHttpRequest' }
+        })
+        .then(function(r) { return r.json(); })
+        .then(function(data) {
+            carterasData = {};
+            carteraEl.innerHTML = '<option value="">— Seleccionar cartera —</option>';
+            boletoEl.innerHTML  = '<option value="" disabled>Selecciona una cartera primero</option>';
+
+            if (!data.carteras || data.carteras.length === 0) {
+                noAlert.style.display = '';
+                dynamic.style.display = '';
+                manual.style.display  = 'none';
+                return;
+            }
+
+            noAlert.style.display = 'none';
+            data.carteras.forEach(function(c) {
+                carterasData[c.id] = c.boletos;
+                var opt = document.createElement('option');
+                opt.value       = c.id;
+                opt.textContent = c.code + ' (' + c.boletos.length + ' disponibles)';
+                carteraEl.appendChild(opt);
+            });
+
+            dynamic.style.display = '';
+            manual.style.display  = 'none';
+        });
+    }
+
+    carteraEl.addEventListener('change', function () {
+        var cid = this.value;
+        boletoEl.innerHTML = '';
+        if (!cid || !carterasData[cid]) {
+            boletoEl.innerHTML = '<option value="" disabled>Selecciona una cartera primero</option>';
+            return;
+        }
+        carterasData[cid].forEach(function(b) {
+            var opt = document.createElement('option');
+            opt.value       = b.id;
+            opt.textContent = 'Boleto #' + b.number;
+            boletoEl.appendChild(opt);
+        });
+    });
+
+    document.getElementById('asignado_id').addEventListener('change', loadCarteras);
+    document.getElementById('sorteo_id').addEventListener('change', loadCarteras);
+})();
+</script>
+@endpush
+@endif

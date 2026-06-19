@@ -23,6 +23,7 @@ Route::group(['prefix' => 'sorteos'], function () {
     Route::post('carteras/import', 'CarterasController@importCsv')->name('sorteos.carteras.import');
     Route::resource('carteras', 'CarterasController')->parameters(['carteras' => 'cartera']);
 
+    Route::get('orders/carteras-by-asignado', 'OrdersController@carterasByAsignado')->name('sorteos.orders.carteras-by-asignado');
     Route::post('orders/{order}/confirm', 'OrdersController@confirmOrder')->name('sorteos.orders.confirm');
     Route::post('orders/{order}/cancel', 'OrdersController@cancelOrder')->name('sorteos.orders.cancel');
     Route::post('orders/{order}/pay', 'PaymentsController@initiate')->name('sorteos.orders.pay');

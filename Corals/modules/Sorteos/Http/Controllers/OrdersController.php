@@ -4,12 +4,17 @@ namespace Corals\Modules\Sorteos\Http\Controllers;
 
 use Corals\Foundation\Http\Controllers\BaseController;
 use Corals\Modules\Sorteos\DataTables\OrdersDataTable;
+use Corals\Modules\Sorteos\Enums\BoletoStatus;
 use Corals\Modules\Sorteos\Http\Requests\OrderRequest;
+use Corals\Modules\Sorteos\Models\Asignado;
+use Corals\Modules\Sorteos\Models\Boleto;
+use Corals\Modules\Sorteos\Models\Cartera;
 use Corals\Modules\Sorteos\Models\Order;
 use Corals\Modules\Sorteos\Models\Sorteo;
 use Corals\Modules\Sorteos\Services\BoletoDigitalService;
 use Corals\Modules\Sorteos\Services\BrevoMailService;
 use Corals\Modules\Sorteos\Services\OrderService;
+use Illuminate\Http\Request;
 
 class OrdersController extends BaseController
 {
@@ -42,6 +47,7 @@ class OrdersController extends BaseController
     {
         $order = new Order();
         $sorteos = Sorteo::pluck('name', 'id');
+        $asignados = Asignado::where('status', 'active')->orderBy('name')->pluck('name', 'id')->prepend('— Sin colaborador —', '');
         $paymentMethods = collect(\Corals\Modules\Sorteos\Enums\PaymentMethod::cases())
             ->mapWithKeys(fn($case) => [$case->value => $case->label()])
             ->all();
@@ -50,7 +56,7 @@ class OrdersController extends BaseController
             'title_singular' => trans('Corals::labels.create_title', ['title' => $this->title_singular]),
         ]);
 
-        return view('Sorteos::orders.create_edit')->with(compact('order', 'sorteos', 'paymentMethods'));
+        return view('Sorteos::orders.create_edit')->with(compact('order', 'sorteos', 'asignados', 'paymentMethods'));
     }
 
     public function store(OrderRequest $request)
@@ -81,6 +87,7 @@ class OrdersController extends BaseController
     public function edit(OrderRequest $request, Order $order)
     {
         $sorteos = Sorteo::pluck('name', 'id');
+        $asignados = Asignado::where('status', 'active')->orderBy('name')->pluck('name', 'id')->prepend('— Sin colaborador —', '');
         $paymentMethods = collect(\Corals\Modules\Sorteos\Enums\PaymentMethod::cases())
             ->mapWithKeys(fn($case) => [$case->value => $case->label()])
             ->all();
@@ -89,7 +96,31 @@ class OrdersController extends BaseController
             'title_singular' => trans('Corals::labels.update_title', ['title' => $order->getIdentifier()]),
         ]);
 
-        return view('Sorteos::orders.create_edit')->with(compact('order', 'sorteos', 'paymentMethods'));
+        return view('Sorteos::orders.create_edit')->with(compact('order', 'sorteos', 'asignados', 'paymentMethods'));
+    }
+
+    public function carterasByAsignado(Request $request)
+    {
+        $asignadoId = (int) $request->input('asignado_id');
+        $sorteoId   = (int) $request->input('sorteo_id');
+
+        if (!$asignadoId || !$sorteoId) {
+            return response()->json(['carteras' => []]);
+        }
+
+        $carteras = Cartera::where('asignado_id', $asignadoId)
+            ->where('sorteo_id', $sorteoId)
+            ->whereNotIn('status', ['sold'])
+            ->with(['boletos' => fn($q) => $q->where('status', BoletoStatus::Available)->orderBy('digital_number')])
+            ->orderBy('code')
+            ->get()
+            ->map(fn($c) => [
+                'id'      => $c->id,
+                'code'    => $c->code,
+                'boletos' => $c->boletos->map(fn($b) => ['id' => $b->id, 'number' => $b->digital_number]),
+            ]);
+
+        return response()->json(['carteras' => $carteras]);
     }
 
     public function update(OrderRequest $request, Order $order)

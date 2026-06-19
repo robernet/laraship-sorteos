@@ -43,6 +43,11 @@ class Order extends BaseModel
         return $this->hasManyThrough(Boleto::class, OrderItem::class, 'order_id', 'id', 'id', 'boleto_id');
     }
 
+    public function asignado()
+    {
+        return $this->belongsTo(\Corals\Modules\Sorteos\Models\Asignado::class);
+    }
+
     public function clubPagoReference()
     {
         return $this->hasOne(ClubPagoReference::class);

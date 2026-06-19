@@ -43,6 +43,7 @@ return [
     ],
     'order'   => [
         'sorteo_id'          => 'Sorteo',
+        'asignado_id'        => 'Colaborador',
         'buyer_name'         => 'Nombre del Comprador',
         'buyer_email'        => 'Correo Electrónico',
         'buyer_phone'        => 'Teléfono',

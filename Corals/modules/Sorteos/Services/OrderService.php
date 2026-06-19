@@ -65,8 +65,21 @@ class OrderService extends BaseServiceClass
     {
         $ids = array_filter((array) $request->input('boleto_ids', []));
 
+        // If a collaborator is set, scope all boleto resolution to their carteras only
+        $asignadoCarteraIds = null;
+        if ($request->filled('asignado_id')) {
+            $asignadoCarteraIds = \Corals\Modules\Sorteos\Models\Cartera::where('asignado_id', $request->input('asignado_id'))
+                ->where('sorteo_id', $sorteoId)
+                ->pluck('id')
+                ->toArray();
+        }
+
         if ($request->filled('cartera_ids')) {
-            $carteraBoletos = Boleto::whereIn('cartera_id', $request->input('cartera_ids'))
+            $requestedIds = $request->input('cartera_ids');
+            if ($asignadoCarteraIds !== null) {
+                $requestedIds = array_intersect($requestedIds, $asignadoCarteraIds);
+            }
+            $carteraBoletos = Boleto::whereIn('cartera_id', $requestedIds)
                 ->where('sorteo_id', $sorteoId)
                 ->where('status', BoletoStatus::Available)
                 ->pluck('id')
@@ -76,20 +89,23 @@ class OrderService extends BaseServiceClass
 
         if ($request->filled('boleto_ids_text')) {
             $digitalNumbers = array_filter(array_map('trim', explode(',', $request->input('boleto_ids_text'))));
-            $textBoletos = Boleto::where('sorteo_id', $sorteoId)
+            $query = Boleto::where('sorteo_id', $sorteoId)
                 ->whereIn('digital_number', $digitalNumbers)
-                ->where('status', BoletoStatus::Available)
-                ->pluck('id')
-                ->toArray();
-            $ids = array_merge($ids, $textBoletos);
+                ->where('status', BoletoStatus::Available);
+            if ($asignadoCarteraIds !== null) {
+                $query->whereIn('cartera_id', $asignadoCarteraIds);
+            }
+            $ids = array_merge($ids, $query->pluck('id')->toArray());
         }
 
         if ($request->filled('cartera_codes_text')) {
             $codes = array_filter(array_map('trim', explode(',', $request->input('cartera_codes_text'))));
-            $carteraIds = \Corals\Modules\Sorteos\Models\Cartera::where('sorteo_id', $sorteoId)
-                ->whereIn('code', $codes)
-                ->pluck('id')
-                ->toArray();
+            $carteraQuery = \Corals\Modules\Sorteos\Models\Cartera::where('sorteo_id', $sorteoId)
+                ->whereIn('code', $codes);
+            if ($asignadoCarteraIds !== null) {
+                $carteraQuery->whereIn('id', $asignadoCarteraIds);
+            }
+            $carteraIds = $carteraQuery->pluck('id')->toArray();
             if (!empty($carteraIds)) {
                 $codeBoletos = Boleto::whereIn('cartera_id', $carteraIds)
                     ->where('status', BoletoStatus::Available)
@@ -97,6 +113,15 @@ class OrderService extends BaseServiceClass
                     ->toArray();
                 $ids = array_merge($ids, $codeBoletos);
             }
+        }
+
+        // Scope any direct boleto_ids to the collaborator's carteras
+        if ($asignadoCarteraIds !== null && !empty($ids)) {
+            $validIds = Boleto::whereIn('id', $ids)
+                ->whereIn('cartera_id', $asignadoCarteraIds)
+                ->pluck('id')
+                ->toArray();
+            $ids = $validIds;
         }
 
         return array_unique($ids);

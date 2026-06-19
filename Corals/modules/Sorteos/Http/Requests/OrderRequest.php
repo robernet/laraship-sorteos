@@ -20,6 +20,7 @@ class OrderRequest extends BaseRequest
 
         if ($this->isStore()) {
             $rules['sorteo_id']      = 'required|integer|exists:sorteos_sorteos,id';
+            $rules['asignado_id']    = 'nullable|integer|exists:sorteos_carteras_asignadas,id';
             $rules['buyer_name']     = 'required|string|max:255';
             $rules['buyer_email']    = 'required|email|max:255';
             $rules['buyer_phone']    = 'required|string|max:50';
