@@ -21,8 +21,11 @@
         @endslot
         @slot('box_tools')
             @if($order->isPending())
-                <button class="btn btn-sm btn-primary" data-toggle="modal" data-target="#payModal">
-                    <i class="fa fa-credit-card"></i> Pagar Orden
+                <button class="btn btn-sm btn-success" data-toggle="modal" data-target="#payModal">
+                    <i class="fa fa-credit-card"></i> Registrar Pago
+                </button>
+                <button class="btn btn-sm btn-danger" data-toggle="modal" data-target="#cancelModal">
+                    <i class="fa fa-times"></i> Cancelar Orden
                 </button>
             @endif
             @if($order->isConfirmed())
@@ -57,6 +60,33 @@
                     <tr>
                         <th>{{ trans('Sorteos::attributes.order.payment_method') }}</th>
                         <td>{{ $order->payment_method?->label() ?? '-' }}</td>
+                    </tr>
+                    <tr>
+                        <th>Referencia / Folio</th>
+                        <td>
+                            @if($order->isConfirmed())
+                                <span id="ref-display">
+                                    {{ $order->payment_reference ?: '—' }}
+                                    <button type="button" class="btn btn-xs btn-link" onclick="document.getElementById('ref-form').style.display='';document.getElementById('ref-display').style.display='none'">
+                                        <i class="fa fa-pencil"></i> Editar
+                                    </button>
+                                </span>
+                                <form id="ref-form" method="POST"
+                                      action="{{ route('sorteos.orders.update-reference', $order->hashed_id) }}"
+                                      style="display:none" class="d-flex align-items-center mt-1">
+                                    @csrf
+                                    <input type="text" name="payment_reference" class="form-control form-control-sm mr-2"
+                                           value="{{ $order->payment_reference }}" placeholder="Folio o referencia">
+                                    <button type="submit" class="btn btn-sm btn-primary mr-1">Guardar</button>
+                                    <button type="button" class="btn btn-sm btn-default"
+                                            onclick="document.getElementById('ref-form').style.display='none';document.getElementById('ref-display').style.display=''">
+                                        Cancelar
+                                    </button>
+                                </form>
+                            @else
+                                {{ $order->payment_reference ?: '—' }}
+                            @endif
+                        </td>
                     </tr>
                     <tr>
                         <th>{{ trans('Sorteos::attributes.order.total_amount') }}</th>
@@ -119,7 +149,6 @@
         @slot('box_title')
             {{ trans('Sorteos::attributes.order.email_history') }}
         @endslot
-
         <table class="table table-sm table-striped">
             <thead>
                 <tr>
@@ -141,6 +170,7 @@
     @endcomponent
     @endif
 
+    {{-- Modal: Registrar Pago --}}
     @if($order->isPending())
     <div class="modal fade" id="payModal" tabindex="-1" role="dialog">
         <div class="modal-dialog" role="document">
@@ -148,7 +178,7 @@
                 @csrf
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h5 class="modal-title">Registrar Pago</h5>
+                        <h5 class="modal-title"><i class="fa fa-credit-card"></i> Registrar Pago</h5>
                         <button type="button" class="close" data-dismiss="modal"><span>&times;</span></button>
                     </div>
                     <div class="modal-body">
@@ -165,14 +195,15 @@
                             <input type="text" name="payment_reference" class="form-control"
                                    placeholder="Número de transferencia, folio, etc."
                                    value="{{ $order->payment_reference }}">
+                            <small class="text-muted">Opcional para transferencia; déjalo en blanco si no tienes el número aún.</small>
                         </div>
                         <div class="alert alert-info" id="pay-clubpago-note" style="display:none">
-                            Serás redirigido a ClubPago para completar el pago.
+                            <i class="fa fa-info-circle"></i> Serás redirigido a ClubPago para completar el pago en línea.
                         </div>
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-default" data-dismiss="modal">Cancelar</button>
-                        <button type="submit" class="btn btn-primary">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Volver</button>
+                        <button type="submit" class="btn btn-success">
                             <i class="fa fa-check"></i> Confirmar Pago
                         </button>
                     </div>
@@ -180,11 +211,35 @@
             </form>
         </div>
     </div>
+
+    {{-- Modal: Cancelar Orden --}}
+    <div class="modal fade" id="cancelModal" tabindex="-1" role="dialog">
+        <div class="modal-dialog modal-sm" role="document">
+            <form method="POST" action="{{ route('sorteos.orders.cancel', $order->hashed_id) }}">
+                @csrf
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title text-danger"><i class="fa fa-exclamation-triangle"></i> Cancelar Orden</h5>
+                        <button type="button" class="close" data-dismiss="modal"><span>&times;</span></button>
+                    </div>
+                    <div class="modal-body">
+                        <p>¿Estás seguro de que deseas cancelar esta orden?</p>
+                        <p class="text-muted small">Los boletos reservados quedarán disponibles nuevamente.</p>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">No, volver</button>
+                        <button type="submit" class="btn btn-danger">Sí, cancelar</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <script>
     (function () {
-        var method = document.getElementById('pay-method');
+        var method   = document.getElementById('pay-method');
         var refGroup = document.getElementById('pay-ref-group');
-        var cpNote = document.getElementById('pay-clubpago-note');
+        var cpNote   = document.getElementById('pay-clubpago-note');
         function toggle() {
             var v = method.value;
             refGroup.style.display = v === 'cash' ? 'none' : '';

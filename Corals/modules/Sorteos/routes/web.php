@@ -28,6 +28,7 @@ Route::group(['prefix' => 'sorteos'], function () {
     Route::post('orders/{order}/cancel', 'OrdersController@cancelOrder')->name('sorteos.orders.cancel');
     Route::post('orders/{order}/pay', 'PaymentsController@initiate')->name('sorteos.orders.pay');
     Route::post('orders/{order}/record-payment', 'PaymentsController@recordPayment')->name('sorteos.orders.record-payment');
+    Route::post('orders/{order}/update-reference', 'OrdersController@updateReference')->name('sorteos.orders.update-reference');
     Route::get('orders/{order}/tickets/download', 'OrdersController@downloadTickets')->name('sorteos.orders.tickets.download');
     Route::post('orders/{order}/resend', 'OrdersController@resendTickets')->name('sorteos.orders.resend');
     Route::resource('orders', 'OrdersController')->parameters(['orders' => 'order']);

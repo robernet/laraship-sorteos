@@ -37,44 +37,9 @@ class OrderTransformer extends BaseTransformer
             'total_amount'   => '$' . number_format($order->total_amount, 2),
             'items_count'    => $order->items_count ?? 0,
             'created_at'     => format_date($order->created_at),
-            'action'         => $this->actions($order) . $this->statusActions($order),
+            'action'         => $this->actions($order),
         ];
 
         return parent::transformResponse($transformedArray);
-    }
-
-    private function statusActions(Order $order): string
-    {
-        if (user()->cannot('update', $order)) {
-            return '';
-        }
-
-        $html = '';
-
-        if ($order->isPending()) {
-            $confirmUrl = url(config('sorteos.models.order.resource_url') . '/' . $order->hashed_id . '/confirm');
-            $html .= HtmlElement('a', [
-                'href'         => $confirmUrl,
-                'data-action'  => 'post',
-                'data-table'   => '.dataTableBuilder',
-                'class'        => 'btn btn-xs btn-success',
-                'title'        => trans('Sorteos::attributes.order.confirm'),
-                'data-confirmation' => '¿Confirmar el pago de esta orden?',
-            ], '<i class="fa fa-check"></i>');
-        }
-
-        if (!$order->isCancelled()) {
-            $cancelUrl = url(config('sorteos.models.order.resource_url') . '/' . $order->hashed_id . '/cancel');
-            $html .= HtmlElement('a', [
-                'href'             => $cancelUrl,
-                'data-action'      => 'post',
-                'data-table'       => '.dataTableBuilder',
-                'class'            => 'btn btn-xs btn-danger',
-                'title'            => trans('Sorteos::attributes.order.cancel'),
-                'data-confirmation' => '¿Cancelar esta orden?',
-            ], '<i class="fa fa-times"></i>');
-        }
-
-        return $html;
     }
 }

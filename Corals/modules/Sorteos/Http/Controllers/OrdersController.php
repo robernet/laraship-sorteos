@@ -171,13 +171,30 @@ class OrdersController extends BaseController
     {
         try {
             $this->orderService->cancelOrder($order);
-            $message = ['level' => 'success', 'message' => trans('Corals::messages.success.updated', ['item' => $this->title_singular])];
+            flash('Orden cancelada correctamente.')->success();
         } catch (\Exception $exception) {
             log_exception($exception, Order::class, 'cancelOrder');
-            $message = ['level' => 'error', 'message' => $exception->getMessage()];
+            flash($exception->getMessage())->error();
         }
 
-        return response()->json($message);
+        return redirect()->back();
+    }
+
+    public function updateReference(OrderRequest $request, Order $order)
+    {
+        try {
+            if (!$order->isConfirmed()) {
+                flash('Solo se puede corregir la referencia de órdenes confirmadas.')->warning();
+                return redirect()->back();
+            }
+            $order->update(['payment_reference' => $request->input('payment_reference')]);
+            flash('Referencia actualizada.')->success();
+        } catch (\Exception $exception) {
+            log_exception($exception, Order::class, 'updateReference');
+            flash($exception->getMessage())->error();
+        }
+
+        return redirect()->back();
     }
 
     public function resendTickets(OrderRequest $request, Order $order)
