@@ -20,13 +20,10 @@
             @endif
         @endslot
         @slot('box_tools')
-            @if($order->isPending() && $order->payment_method?->value === 'clubpago')
-                <form method="POST" action="{{ route('sorteos.orders.pay', $order->hashed_id) }}" class="d-inline">
-                    @csrf
-                    <button type="submit" class="btn btn-sm btn-primary">
-                        <i class="fa fa-credit-card"></i> {{ trans('Sorteos::attributes.order.pay_with_clubpago') }}
-                    </button>
-                </form>
+            @if($order->isPending())
+                <button class="btn btn-sm btn-primary" data-toggle="modal" data-target="#payModal">
+                    <i class="fa fa-credit-card"></i> Pagar Orden
+                </button>
             @endif
             @if($order->isConfirmed())
                 <button class="btn btn-sm btn-info"
@@ -142,5 +139,60 @@
             </tbody>
         </table>
     @endcomponent
+    @endif
+
+    @if($order->isPending())
+    <div class="modal fade" id="payModal" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document">
+            <form method="POST" action="{{ route('sorteos.orders.record-payment', $order->hashed_id) }}">
+                @csrf
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Registrar Pago</h5>
+                        <button type="button" class="close" data-dismiss="modal"><span>&times;</span></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="form-group">
+                            <label>Método de pago <span class="text-danger">*</span></label>
+                            <select name="payment_method" id="pay-method" class="form-control" required>
+                                <option value="cash"     {{ $order->payment_method?->value === 'cash'     ? 'selected' : '' }}>Efectivo</option>
+                                <option value="transfer" {{ $order->payment_method?->value === 'transfer' ? 'selected' : '' }}>Transferencia</option>
+                                <option value="clubpago" {{ $order->payment_method?->value === 'clubpago' ? 'selected' : '' }}>ClubPago</option>
+                            </select>
+                        </div>
+                        <div class="form-group" id="pay-ref-group">
+                            <label>Referencia / Folio</label>
+                            <input type="text" name="payment_reference" class="form-control"
+                                   placeholder="Número de transferencia, folio, etc."
+                                   value="{{ $order->payment_reference }}">
+                        </div>
+                        <div class="alert alert-info" id="pay-clubpago-note" style="display:none">
+                            Serás redirigido a ClubPago para completar el pago.
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Cancelar</button>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fa fa-check"></i> Confirmar Pago
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+    <script>
+    (function () {
+        var method = document.getElementById('pay-method');
+        var refGroup = document.getElementById('pay-ref-group');
+        var cpNote = document.getElementById('pay-clubpago-note');
+        function toggle() {
+            var v = method.value;
+            refGroup.style.display = v === 'cash' ? 'none' : '';
+            cpNote.style.display   = v === 'clubpago' ? '' : 'none';
+        }
+        method.addEventListener('change', toggle);
+        toggle();
+    })();
+    </script>
     @endif
 @endsection

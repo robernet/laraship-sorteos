@@ -36,6 +36,46 @@ class PaymentsController extends BaseController
     }
 
     /**
+     * Record a manual payment (cash/transfer) or initiate ClubPago, then confirm.
+     */
+    public function recordPayment(\Illuminate\Http\Request $request, Order $order)
+    {
+        if (!$order->isPending()) {
+            flash('Solo se pueden pagar órdenes pendientes.')->error();
+            return redirect()->back();
+        }
+
+        $method    = $request->input('payment_method', $order->payment_method?->value);
+        $reference = $request->input('payment_reference');
+
+        $order->update([
+            'payment_method'    => $method,
+            'payment_reference' => $reference,
+        ]);
+
+        if ($method === 'clubpago') {
+            try {
+                $result = $this->clubPago->initiatePayment($order);
+                return redirect()->away($result['payment_url']);
+            } catch (\Exception $e) {
+                log_exception($e, Order::class, 'initiatePayment');
+                flash($e->getMessage())->error();
+                return redirect()->back();
+            }
+        }
+
+        try {
+            $this->orderService->confirmOrder($order);
+            flash('Pago registrado y orden confirmada.')->success();
+        } catch (\Exception $e) {
+            log_exception($e, Order::class, 'recordPayment');
+            flash($e->getMessage())->error();
+        }
+
+        return redirect()->back();
+    }
+
+    /**
      * Receive and process ClubPago webhook notifications (public, no CSRF/auth).
      */
     public function webhook(Request $request)
