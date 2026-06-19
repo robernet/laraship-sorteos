@@ -12,9 +12,9 @@ use Illuminate\Foundation\Http\FormRequest;
 
 class OrderService extends BaseServiceClass
 {
-    protected function postStore(FormRequest $request, $order): void
+    protected function postStore(FormRequest $request, $additionalData): void
     {
-        $this->attachBoletos($request, $order);
+        $this->attachBoletos($request, $this->model);
     }
 
     private function attachBoletos(FormRequest $request, Order $order): void
