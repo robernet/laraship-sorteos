@@ -60,7 +60,7 @@ class OrdersDataTable extends BaseDataTable
                 'title'   => trans('Sorteos::attributes.order.status'),
                 'class'   => 'col-md-3',
                 'type'    => 'select',
-                'options' => collect(\Corals\Modules\Sorteos\Enums\OrderStatus::cases())
+                'options' => ['' => '— Todos —'] + collect(\Corals\Modules\Sorteos\Enums\OrderStatus::cases())
                     ->mapWithKeys(fn($case) => [$case->value => $case->label()])
                     ->all(),
                 'active'  => true,
