@@ -166,6 +166,22 @@ class CarterasController extends BaseController
 
         $status = CarteraStatus::from($request->status);
 
+        if ($cartera->status === CarteraStatus::Sold) {
+            if ($status !== CarteraStatus::Entregado) {
+                return response()->json(['level' => 'error', 'message' => 'Solo se puede registrar la entrega de una cartera vendida.'], 422);
+            }
+            $cartera->update(['entregado_at' => now()]);
+            $cartera->refresh();
+            return response()->json([
+                'level'        => 'success',
+                'status'       => $cartera->status->value,
+                'label'        => $cartera->status->label(),
+                'badgeClass'   => $cartera->status->badgeClass(),
+                'asignado_at'  => $cartera->asignado_at?->format('d/m/Y H:i'),
+                'entregado_at' => $cartera->entregado_at?->format('d/m/Y H:i'),
+            ]);
+        }
+
         // Dates always recalculate on every transition — never frozen
         $data = match ($status) {
             CarteraStatus::Asignado  => ['status' => $status->value, 'asignado_at' => $cartera->asignado_at ?? now(), 'entregado_at' => null],
