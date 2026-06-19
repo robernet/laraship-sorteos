@@ -13,8 +13,13 @@ Route::post('sorteo/{slug}/comprar', 'PublicSorteoController@checkout')->name('s
 // Admin routes — specific literal paths first, resource catch-alls last.
 Route::group(['prefix' => 'sorteos'], function () {
     Route::resource('boletos', 'BoletosController')->parameters(['boletos' => 'boleto'])->only(['index', 'show']);
+    Route::get('boletos/create', fn() => redirect(url('sorteos/carteras/create'))->with('info', 'Los boletos se generan automáticamente al crear una cartera.'))->name('sorteos.boletos.create');
     Route::get('boletos/{boleto}/pdf', 'BoletosController@download')->name('sorteos.boletos.pdf');
 
+    Route::get('carteras/generate', 'CarterasController@showGenerate')->name('sorteos.carteras.generate');
+    Route::post('carteras/generate', 'CarterasController@generate')->name('sorteos.carteras.do-generate');
+    Route::post('carteras/{sorteo}/activate', 'CarterasController@activate')->name('sorteos.carteras.activate');
+    Route::post('carteras/{cartera}/quick-status', 'CarterasController@quickStatus')->name('sorteos.carteras.quick-status');
     Route::get('carteras/import/template', 'CarterasController@downloadTemplate')->name('sorteos.carteras.import.template');
     Route::post('carteras/import', 'CarterasController@importCsv')->name('sorteos.carteras.import');
     Route::resource('carteras', 'CarterasController')->parameters(['carteras' => 'cartera']);
@@ -25,6 +30,9 @@ Route::group(['prefix' => 'sorteos'], function () {
     Route::get('orders/{order}/tickets/download', 'OrdersController@downloadTickets')->name('sorteos.orders.tickets.download');
     Route::post('orders/{order}/resend', 'OrdersController@resendTickets')->name('sorteos.orders.resend');
     Route::resource('orders', 'OrdersController')->parameters(['orders' => 'order']);
+
+    Route::post('asignados/{asignado}/assign-carteras', 'AsignadosController@assignCarteras')->name('sorteos.asignados.assign-carteras');
+    Route::resource('asignados', 'AsignadosController')->parameters(['asignados' => 'asignado']);
 
     Route::get('audit', 'AuditController@index')->name('sorteos.audit.index');
 

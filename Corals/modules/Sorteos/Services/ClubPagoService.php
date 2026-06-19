@@ -2,123 +2,96 @@
 
 namespace Corals\Modules\Sorteos\Services;
 
+use Corals\Modules\ClubPago\Models\ClubPagoReference;
 use Corals\Modules\Sorteos\Models\Order;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 
 class ClubPagoService
 {
-    private string $apiUrl;
-    private string $merchantId;
-    private string $secretKey;
-    private string $apiKey;
-
-    public function __construct()
-    {
-        $this->apiUrl     = \Settings::get('clubpago_api_url', 'https://api.clubpago.com.mx');
-        $this->merchantId = \Settings::get('clubpago_merchant_id', '');
-        $this->secretKey  = \Settings::get('clubpago_secret_key', '');
-        $this->apiKey     = \Settings::get('clubpago_api_key', '');
-    }
-
     public function isConfigured(): bool
     {
-        return $this->merchantId && $this->secretKey && $this->apiKey;
+        $prefix = $this->prefix();
+        return !empty(\Settings::get("{$prefix}_url_auth"))
+            && !empty(\Settings::get("{$prefix}_user"))
+            && !empty(\Settings::get("{$prefix}_password"));
     }
 
-    /**
-     * Create a payment reference in ClubPago and return the payment URL.
-     */
-    public function initiatePayment(Order $order, ?string $returnUrl = null): array
+    public function initiatePayment(Order $order): ClubPagoReference
     {
-        $reference = $this->generateReference($order);
+        $token = $this->getToken();
 
-        $payload = [
-            'merchant_id'  => $this->merchantId,
-            'reference'    => $reference,
-            'amount'       => (float) $order->total_amount,
-            'currency'     => 'MXN',
-            'description'  => 'Sorteo ITSON — Orden #' . $order->id,
-            'buyer_name'   => $order->buyer_name,
-            'buyer_email'  => $order->buyer_email,
-            'buyer_phone'  => $order->buyer_phone,
-            'callback_url' => route('sorteos.webhook.clubpago'),
-            'return_url'   => $returnUrl ?? url(config('sorteos.models.order.resource_url') . '/' . $order->hashed_id),
-        ];
+        $orderId     = 'ORD-' . sprintf('%06d', $order->id);
+        $descripcion = '[' . \Settings::get('site_name', 'Sorteos ITSON') . '] [' . $orderId . ']';
+        $account     = str_pad(date('YmdHis'), 15, '0', STR_PAD_LEFT)
+                     . str_pad((string) $order->id, 7, '0', STR_PAD_LEFT);
 
-        $response = Http::withHeaders([
-            'Authorization' => 'Bearer ' . $this->apiKey,
-            'Content-Type'  => 'application/json',
-        ])->post($this->apiUrl . '/v1/payments', $payload);
+        $url = \Settings::get($this->prefix() . '_url_payformat');
 
-        if ($response->failed()) {
-            Log::error('ClubPago payment initiation failed', [
+        $response = Http::withToken($token)->post($url, [
+            'Description'    => $descripcion,
+            'Amount'         => (float) $order->total_amount,
+            'Account'        => $account,
+            'CustomerEmail'  => $order->buyer_email,
+            'CustomerName'   => $order->buyer_name,
+            'ExpirationDate' => null,
+        ]);
+
+        $data = $response->json();
+
+        if (empty($data['Reference'])) {
+            Log::error('ClubPago reference generation failed', [
                 'order_id' => $order->id,
                 'status'   => $response->status(),
                 'body'     => $response->body(),
             ]);
-            throw new \RuntimeException('Error al iniciar el pago con ClubPago: ' . $response->json('message', 'Error desconocido'));
+            throw new \RuntimeException('No se pudo generar la referencia de pago con ClubPago.');
         }
 
-        $data = $response->json();
+        $ref = ClubPagoReference::updateOrCreate(
+            ['reference' => $data['Reference']],
+            [
+                'order_id'      => $order->id,
+                'amount'        => $order->total_amount,
+                'currency'      => 'MXN',
+                'authorization' => '',
+                'bar_code'      => $data['BarCode'] ?? '',
+                'pay_format'    => $data['PayFormat'] ?? '',
+                'message'       => $data['Message'] ?? '',
+                'folio'         => $data['Folio'] ?? '',
+                'date'          => $data['Date'] ?? '',
+                'status'        => 'pending',
+                'user_id'       => null,
+            ]
+        );
 
-        $order->update(['payment_reference' => $reference]);
+        $order->update(['payment_reference' => $data['Reference']]);
 
-        return [
-            'reference'   => $reference,
-            'payment_url' => $data['payment_url'],
-        ];
+        return $ref;
     }
 
-    /**
-     * Validate the HMAC-SHA256 signature sent by ClubPago on webhooks.
-     */
-    public function validateWebhookSignature(Request $request): bool
+    private function getToken(): string
     {
-        $signature = $request->header('X-ClubPago-Signature');
+        $prefix = $this->prefix();
+        $url    = \Settings::get("{$prefix}_url_auth");
+        $user   = \Settings::get("{$prefix}_user");
+        $pass   = \Settings::get("{$prefix}_password");
 
-        if (!$signature) {
-            return false;
+        $response = Http::withHeaders(['Content-Type' => 'application/json'])
+            ->post($url, ['user' => $user, 'pswd' => $pass])
+            ->json();
+
+        if (empty($response['Token'])) {
+            Log::error('ClubPago auth failed', ['response' => $response]);
+            throw new \RuntimeException('No se pudo autenticar con ClubPago.');
         }
 
-        $expected = hash_hmac('sha256', $request->getContent(), $this->secretKey);
-
-        return hash_equals($expected, $signature);
+        return $response['Token'];
     }
 
-    /**
-     * Process a confirmed webhook payload and return the matching Order.
-     */
-    public function resolveOrderFromWebhook(array $payload): ?Order
+    private function prefix(): string
     {
-        $reference = $payload['reference'] ?? null;
-
-        if (!$reference) {
-            return null;
-        }
-
-        return Order::where('payment_reference', $reference)->first();
-    }
-
-    /**
-     * Determine if the webhook payload represents a successful payment.
-     */
-    public function isPaymentConfirmed(array $payload): bool
-    {
-        return ($payload['status'] ?? '') === 'paid';
-    }
-
-    /**
-     * Determine if the webhook payload represents a rejected/failed payment.
-     */
-    public function isPaymentRejected(array $payload): bool
-    {
-        return in_array($payload['status'] ?? '', ['rejected', 'failed', 'cancelled']);
-    }
-
-    private function generateReference(Order $order): string
-    {
-        return 'ITSON-' . strtoupper(base_convert($order->id, 10, 36)) . '-' . now()->format('ymdHi');
+        $sandbox = \Settings::get('payment_clubpago_sandbox_mode', 'true') === 'true';
+        return $sandbox ? 'payment_clubpago_sandbox' : 'payment_clubpago_live';
     }
 }

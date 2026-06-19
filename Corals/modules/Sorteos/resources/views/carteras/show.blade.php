@@ -25,6 +25,10 @@
                         <td>{{ $cartera->sorteo?->name ?? '-' }}</td>
                     </tr>
                     <tr>
+                        <th>{{ trans('Sorteos::attributes.cartera.asignado_id') }}</th>
+                        <td>{{ $cartera->asignado?->name ?? '-' }}</td>
+                    </tr>
+                    <tr>
                         <th>{{ trans('Sorteos::attributes.cartera.status') }}</th>
                         <td>
                             @if($cartera->status)

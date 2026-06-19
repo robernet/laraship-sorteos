@@ -47,7 +47,7 @@ abstract class BaseDataTable extends DataTable
 
     public function renderAjaxAndActions()
     {
-        if ($this->request()->ajax() && $this->request()->wantsJson()) {
+        if ($this->request()->ajax() && ($this->request()->wantsJson() || $this->request()->has('draw'))) {
             return app()->call([$this, 'ajax']);
         }
 

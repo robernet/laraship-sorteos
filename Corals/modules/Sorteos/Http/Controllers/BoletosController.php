@@ -30,7 +30,7 @@ class BoletosController extends BaseController
 
     public function index(BoletoRequest $request, BoletosDataTable $dataTable)
     {
-        return $dataTable->render('Sorteos::boletos.index');
+        return $dataTable->render('Sorteos::boletos.index', ['hideCreate' => true]);
     }
 
     public function show(BoletoRequest $request, Boleto $boleto)

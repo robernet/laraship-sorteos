@@ -14,9 +14,13 @@ return [
             'presenter'    => \Corals\Modules\Sorteos\Transformers\BoletoPresenter::class,
             'resource_url' => 'sorteos/boletos',
         ],
-        'order'   => [
+        'order'    => [
             'presenter'    => \Corals\Modules\Sorteos\Transformers\OrderPresenter::class,
             'resource_url' => 'sorteos/orders',
+        ],
+        'asignado' => [
+            'presenter'    => \Corals\Modules\Sorteos\Transformers\AsignadoPresenter::class,
+            'resource_url' => 'sorteos/asignados',
         ],
     ],
 ];

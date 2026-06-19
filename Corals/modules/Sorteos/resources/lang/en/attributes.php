@@ -16,6 +16,7 @@ return [
     ],
     'cartera' => [
         'sorteo_id'      => 'Sorteo',
+        'asignado_id'    => 'Asignado',
         'code'           => 'Código de Cartera',
         'physical_start' => 'Número Físico Inicial',
         'physical_end'   => 'Número Físico Final',
@@ -23,6 +24,15 @@ return [
         'digital_end'    => 'Número Digital Final',
         'status'         => 'Estado',
         'boletos_count'  => 'Boletos',
+    ],
+    'asignado' => [
+        'name'           => 'Nombre',
+        'email'          => 'Correo Electrónico',
+        'phone'          => 'Teléfono',
+        'type'           => 'Tipo',
+        'status'         => 'Estado',
+        'notes'          => 'Notas',
+        'carteras_count' => 'Carteras',
     ],
     'boleto'  => [
         'sorteo_id'       => 'Sorteo',

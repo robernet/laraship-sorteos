@@ -23,9 +23,11 @@ class ClubPagoRouteServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        //
         parent::boot();
 
+        if (class_exists('Breadcrumbs')) {
+            require __DIR__ . '/../routes/clubpago_breadcrumbs.php';
+        }
     }
 
     /**
@@ -51,7 +53,7 @@ class ClubPagoRouteServiceProvider extends ServiceProvider
      */
     protected function mapWebRoutes()
     {
-        Route::middleware('guest')
+        Route::middleware('web')
             ->namespace($this->namespace)
             ->group(__DIR__ . '/../routes/web.php');
     }

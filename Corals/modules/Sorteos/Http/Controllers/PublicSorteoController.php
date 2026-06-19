@@ -97,15 +97,14 @@ class PublicSorteoController extends \Corals\Foundation\Http\Controllers\PublicB
         });
 
         try {
-            $returnUrl = route('sorteos.public.order', $order->hashed_id);
-            $result    = $this->clubPago->initiatePayment($order, $returnUrl);
+            $this->clubPago->initiatePayment($order);
 
-            return redirect()->away($result['payment_url']);
+            return redirect()->route('sorteos.public.order', $order->hashed_id);
         } catch (\Exception $e) {
             Boleto::whereIn('id', $boletos->pluck('id'))->update(['status' => 'available']);
             $order->forceDelete();
 
-            return back()->withInput()->with('error', 'Error al iniciar el pago. Por favor intenta de nuevo.');
+            return back()->withInput()->with('error', 'Error al iniciar el pago: ' . $e->getMessage());
         }
     }
 

@@ -2,10 +2,12 @@
 
 namespace Corals\Modules\Sorteos\Providers;
 
+use Corals\Modules\Sorteos\Models\Asignado;
 use Corals\Modules\Sorteos\Models\Boleto;
 use Corals\Modules\Sorteos\Models\Cartera;
 use Corals\Modules\Sorteos\Models\Order;
 use Corals\Modules\Sorteos\Models\Sorteo;
+use Corals\Modules\Sorteos\Policies\AsignadoPolicy;
 use Corals\Modules\Sorteos\Policies\BoletoPolicy;
 use Corals\Modules\Sorteos\Policies\CarteraPolicy;
 use Corals\Modules\Sorteos\Policies\OrderPolicy;
@@ -20,10 +22,11 @@ class SorteosAuthServiceProvider extends ServiceProvider
      * @var array
      */
     protected $policies = [
-        Sorteo::class  => SorteoPolicy::class,
-        Cartera::class => CarteraPolicy::class,
-        Boleto::class  => BoletoPolicy::class,
-        Order::class   => OrderPolicy::class,
+        Asignado::class => AsignadoPolicy::class,
+        Sorteo::class   => SorteoPolicy::class,
+        Cartera::class  => CarteraPolicy::class,
+        Boleto::class   => BoletoPolicy::class,
+        Order::class    => OrderPolicy::class,
     ];
 
     /**

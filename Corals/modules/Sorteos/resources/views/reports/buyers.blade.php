@@ -1,4 +1,4 @@
-@extends('layouts.crud.index')
+@extends('layouts.master')
 
 @section('content_header')
     @component('components.content_header')

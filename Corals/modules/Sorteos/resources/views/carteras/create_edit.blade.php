@@ -28,6 +28,15 @@
                 </div>
 
                 <div class="row">
+                    <div class="col-md-6">
+                        {!! CoralsForm::select('asignado_id', 'Sorteos::attributes.cartera.asignado_id', $asignados, false, $cartera->asignado_id) !!}
+                    </div>
+                    <div class="col-md-6">
+                        {!! CoralsForm::select('status', 'Sorteos::attributes.cartera.status', $statusOptions, false, $cartera->status?->value) !!}
+                    </div>
+                </div>
+
+                <div class="row">
                     <div class="col-md-3">
                         {!! CoralsForm::number('physical_start', 'Sorteos::attributes.cartera.physical_start', true, $cartera->physical_start) !!}
                     </div>

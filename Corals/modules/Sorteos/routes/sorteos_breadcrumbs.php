@@ -59,6 +59,22 @@ Breadcrumbs::register('sorteos_order_show', function ($breadcrumbs) {
     $breadcrumbs->push(view()->shared('title_singular'));
 });
 
+//Asignado
+Breadcrumbs::register('sorteos_asignados', function ($breadcrumbs) {
+    $breadcrumbs->parent('dashboard');
+    $breadcrumbs->push(trans('Sorteos::module.asignado.title'), url(config('sorteos.models.asignado.resource_url')));
+});
+
+Breadcrumbs::register('sorteos_asignado_create_edit', function ($breadcrumbs) {
+    $breadcrumbs->parent('sorteos_asignados');
+    $breadcrumbs->push(view()->shared('title_singular'));
+});
+
+Breadcrumbs::register('sorteos_asignado_show', function ($breadcrumbs) {
+    $breadcrumbs->parent('sorteos_asignados');
+    $breadcrumbs->push(view()->shared('title_singular'));
+});
+
 //Audit
 Breadcrumbs::register('sorteos_audit', function ($breadcrumbs) {
     $breadcrumbs->parent('dashboard');

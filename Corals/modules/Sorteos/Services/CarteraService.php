@@ -14,9 +14,9 @@ class CarteraService extends BaseServiceClass
 {
     const TICKETS_PER_WALLET = 10;
 
-    protected function postStore(FormRequest $request, $cartera)
+    protected function postStore(FormRequest $request, $additionalData)
     {
-        $this->generateBoletos($cartera);
+        $this->generateBoletos($this->model);
     }
 
     private function generateBoletos(Cartera $cartera): void
@@ -94,12 +94,70 @@ class CarteraService extends BaseServiceClass
             ->whereIn('status', [BoletoStatus::Sold->value, BoletoStatus::Reserved->value])
             ->count();
 
-        $newStatus = match(true) {
-            $taken === 0      => CarteraStatus::Available,
-            $taken === $total => CarteraStatus::Sold,
-            default           => CarteraStatus::Partial,
-        };
+        $isProtected = in_array($cartera->status, [
+            CarteraStatus::Asignado,
+            CarteraStatus::Entregado,
+            CarteraStatus::Active,
+        ]);
 
-        $cartera->update(['status' => $newStatus]);
+        if ($total > 0 && $taken === $total) {
+            $cartera->update(['status' => CarteraStatus::Sold]);
+        } elseif (!$isProtected) {
+            $cartera->update(['status' => $taken === 0 ? CarteraStatus::Available : CarteraStatus::Partial]);
+        }
+    }
+
+    public function generateForSorteo(int $sorteoId, int $totalBoletos, int $startNumber, string $prefix): array
+    {
+        $numCarteras = (int) ceil($totalBoletos / self::TICKETS_PER_WALLET);
+        $padding     = max(3, strlen((string) $numCarteras));
+        $created     = 0;
+        $skipped     = 0;
+
+        for ($i = 1; $i <= $numCarteras; $i++) {
+            $code       = $prefix . str_pad($i, $padding, '0', STR_PAD_LEFT);
+            $physStart  = $startNumber + (($i - 1) * self::TICKETS_PER_WALLET);
+            $physEnd    = $physStart + self::TICKETS_PER_WALLET - 1;
+
+            $codeExists = Cartera::where('sorteo_id', $sorteoId)->where('code', $code)->exists();
+            $rangeExists = Cartera::where('sorteo_id', $sorteoId)
+                ->where(function ($q) use ($physStart, $physEnd) {
+                    $q->whereBetween('physical_start', [$physStart, $physEnd])
+                      ->orWhereBetween('physical_end', [$physStart, $physEnd]);
+                })->exists();
+
+            if ($codeExists || $rangeExists) {
+                $skipped++;
+                continue;
+            }
+
+            $cartera = Cartera::create([
+                'sorteo_id'      => $sorteoId,
+                'code'           => $code,
+                'physical_start' => $physStart,
+                'physical_end'   => $physEnd,
+                'digital_start'  => $physStart,
+                'digital_end'    => $physEnd,
+                'status'         => CarteraStatus::Available->value,
+            ]);
+
+            $this->generateBoletos($cartera);
+            $created++;
+        }
+
+        return compact('created', 'skipped', 'numCarteras');
+    }
+
+    public function activateCarteras(int $sorteoId): int
+    {
+        return Cartera::where('sorteo_id', $sorteoId)
+            ->whereNotIn('status', [CarteraStatus::Sold->value, CarteraStatus::Active->value])
+            ->update(['status' => CarteraStatus::Active->value, 'updated_at' => now()]);
+    }
+
+    public function getNextStartNumber(int $sorteoId): int
+    {
+        $max = Cartera::where('sorteo_id', $sorteoId)->max('physical_end');
+        return $max ? $max + 1 : 1;
     }
 }

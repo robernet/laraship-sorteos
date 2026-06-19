@@ -55,13 +55,22 @@ class SorteosMenuDatabaseSeeder extends Seeder
                 'order'           => 2,
             ],
             [
+                'url'             => config('sorteos.models.asignado.resource_url'),
+                'active_menu_url' => config('sorteos.models.asignado.resource_url') . '*',
+                'name'            => 'Asignados',
+                'description'     => 'Personas e instituciones a quienes se asignan carteras',
+                'icon'            => 'fa fa-users',
+                'roles'           => $operatorRoles,
+                'order'           => 3,
+            ],
+            [
                 'url'             => config('sorteos.models.boleto.resource_url'),
                 'active_menu_url' => config('sorteos.models.boleto.resource_url') . '*',
                 'name'            => 'Boletos',
                 'description'     => 'Consulta y validación de boletos',
                 'icon'            => 'fa fa-barcode',
                 'roles'           => $allRoles,
-                'order'           => 3,
+                'order'           => 4,
             ],
             [
                 'url'             => config('sorteos.models.order.resource_url'),
@@ -70,7 +79,7 @@ class SorteosMenuDatabaseSeeder extends Seeder
                 'description'     => 'Historial de órdenes y pagos',
                 'icon'            => 'fa fa-shopping-cart',
                 'roles'           => $allRoles,
-                'order'           => 4,
+                'order'           => 5,
             ],
             [
                 'url'             => 'sorteos/reports',

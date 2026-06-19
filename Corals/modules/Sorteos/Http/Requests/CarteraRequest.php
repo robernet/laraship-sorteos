@@ -36,6 +36,8 @@ class CarteraRequest extends BaseRequest
                     ->where('sorteo_id', $cartera?->sorteo_id)
                     ->ignore($cartera?->id),
             ];
+            $rules['asignado_id'] = 'nullable|integer|exists:sorteos_carteras_asignadas,id';
+            $rules['status']      = 'nullable|string';
         }
 
         return $rules;

@@ -32,6 +32,13 @@ return [
 
         'delivery_notes' => 'Club Pago Account Information',
     ],
+    'clubpago_reference' => [
+        'order_number' => 'Order',
+        'amount'       => 'Amount',
+        'reference'    => 'Reference',
+        'folio'        => 'Folio',
+        'pay_format'   => 'Pay Format',
+    ],
     'mail' => [
         'order' => 'Order :',
         'folio' => 'Folio :',

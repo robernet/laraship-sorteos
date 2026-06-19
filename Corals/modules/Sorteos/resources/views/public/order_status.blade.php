@@ -39,10 +39,32 @@
                 <span>Tus boletos digitales fueron enviados a <strong>{{ $order->buyer_email }}</strong>. Revisa tu bandeja de entrada.</span>
             </div>
         @elseif($order->isPending())
+            @php $ref = $order->clubPagoReference; @endphp
+            @if($ref)
+            <div class="srt-card" style="border-left:4px solid var(--c-warning)">
+                <div class="srt-card__title"><i class="fa fa-barcode"></i> Referencia de pago ClubPago</div>
+                <div class="srt-info-row">
+                    <span class="srt-info-row__label">Referencia</span>
+                    <span class="srt-info-row__value"><strong>{{ $ref->reference }}</strong></span>
+                </div>
+                <div class="srt-info-row">
+                    <span class="srt-info-row__label">Folio</span>
+                    <span class="srt-info-row__value">{{ $ref->folio }}</span>
+                </div>
+                <div class="srt-info-row">
+                    <span class="srt-info-row__label">Monto a pagar</span>
+                    <span class="srt-info-row__value srt-info-row__value--total">${{ number_format($ref->amount, 2) }} MXN</span>
+                </div>
+                <div style="margin-top:10px; font-size:13px; color:var(--c-muted)">
+                    Presenta esta referencia en cualquier terminal ClubPago para realizar tu pago. Recibirás tus boletos digitales por correo al confirmar el pago.
+                </div>
+            </div>
+            @else
             <div class="srt-alert srt-alert--warning">
                 <i class="fa fa-clock-o"></i>
                 <span>Tu pago está siendo procesado. Recibirás un correo de confirmación en breve.</span>
             </div>
+            @endif
         @endif
 
         <div class="srt-card">

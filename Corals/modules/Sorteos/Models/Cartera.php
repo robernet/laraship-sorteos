@@ -5,6 +5,7 @@ namespace Corals\Modules\Sorteos\Models;
 use Corals\Foundation\Models\BaseModel;
 use Corals\Foundation\Transformers\PresentableTrait;
 use Corals\Modules\Sorteos\Enums\CarteraStatus;
+use Corals\Modules\Sorteos\Models\Asignado;
 use Spatie\Activitylog\Traits\LogsActivity;
 
 class Cartera extends BaseModel
@@ -25,11 +26,18 @@ class Cartera extends BaseModel
         'physical_end'   => 'integer',
         'digital_start'  => 'integer',
         'digital_end'    => 'integer',
+        'asignado_at'    => 'datetime',
+        'entregado_at'   => 'datetime',
     ];
 
     public function sorteo()
     {
         return $this->belongsTo(Sorteo::class);
+    }
+
+    public function asignado()
+    {
+        return $this->belongsTo(Asignado::class);
     }
 
     public function boletos()

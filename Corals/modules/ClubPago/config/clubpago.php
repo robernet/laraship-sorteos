@@ -111,7 +111,7 @@ return [
 
     'models' => [
         'clubpago_reference' => [
-            'resource_url' => 'sorteos/clubpago-references',
+            'resource_url' => 'clubpago/clubpago-references',
         ],
     ],
 ];

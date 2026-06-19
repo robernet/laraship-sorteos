@@ -31,6 +31,13 @@ return [
         'pay_format' => '<span>Formato de Pago : <a class="btn btn-success" href=":arg" target="_blank"><b>Imprimir Referencia en PDF</b></a></span>',
         'delivery_notes' => 'Club Pago Account Information',
     ],
+    'clubpago_reference' => [
+        'order_number' => 'Orden',
+        'amount'       => 'Monto',
+        'reference'    => 'Referencia',
+        'folio'        => 'Folio',
+        'pay_format'   => 'Formato de Pago',
+    ],
     'mail' => [
         'order' => 'Orden :',
         'folio' => 'Folio :',

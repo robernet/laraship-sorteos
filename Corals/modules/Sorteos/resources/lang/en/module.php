@@ -13,8 +13,12 @@ return [
         'title'          => 'Boletos',
         'title_singular' => 'Boleto',
     ],
-    'order'   => [
+    'order'    => [
         'title'          => 'Órdenes',
         'title_singular' => 'Orden',
+    ],
+    'asignado' => [
+        'title'          => 'Asignados',
+        'title_singular' => 'Asignado',
     ],
 ];

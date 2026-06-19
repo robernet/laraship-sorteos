@@ -2,7 +2,7 @@
 
 // Admin: ClubPago reference list (read-only)
 Route::group(['middleware' => 'auth'], function () {
-    Route::resource('sorteos/clubpago-references', 'ClubPagoReferencesController', ['only' => ['index']]);
+    Route::resource('clubpago/clubpago-references', 'ClubPagoReferencesController', ['only' => ['index']]);
 });
 
 // Terminal/POS routes — validated by verificaHeader(), no auth middleware needed

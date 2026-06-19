@@ -4,10 +4,12 @@ namespace Corals\Modules\Sorteos\Http\Controllers;
 
 use Corals\Foundation\Http\Controllers\BaseController;
 use Corals\Modules\Sorteos\DataTables\CarterasDataTable;
+use Corals\Modules\Sorteos\Enums\CarteraStatus;
 use Corals\Modules\Sorteos\Http\Requests\CarteraRequest;
 use Corals\Modules\Sorteos\Models\Cartera;
 use Corals\Modules\Sorteos\Models\Sorteo;
 use Corals\Modules\Sorteos\Services\CarteraService;
+use Illuminate\Http\Request;
 
 class CarterasController extends BaseController
 {
@@ -34,14 +36,16 @@ class CarterasController extends BaseController
 
     public function create(CarteraRequest $request)
     {
-        $cartera = new Cartera();
-        $sorteos = Sorteo::pluck('name', 'id');
+        $cartera       = new Cartera();
+        $sorteos       = Sorteo::pluck('name', 'id');
+        $asignados     = \Corals\Modules\Sorteos\Models\Asignado::where('status', 'active')->pluck('name', 'id')->prepend('— Sin asignar —', '')->all();
+        $statusOptions = collect(\Corals\Modules\Sorteos\Enums\CarteraStatus::cases())->mapWithKeys(fn($c) => [$c->value => $c->label()])->all();
 
         $this->setViewSharedData([
             'title_singular' => trans('Corals::labels.create_title', ['title' => $this->title_singular]),
         ]);
 
-        return view('Sorteos::carteras.create_edit')->with(compact('cartera', 'sorteos'));
+        return view('Sorteos::carteras.create_edit')->with(compact('cartera', 'sorteos', 'asignados', 'statusOptions'));
     }
 
     public function store(CarteraRequest $request)
@@ -71,17 +75,26 @@ class CarterasController extends BaseController
 
     public function edit(CarteraRequest $request, Cartera $cartera)
     {
-        $sorteos = Sorteo::pluck('name', 'id');
+        $sorteos       = Sorteo::pluck('name', 'id');
+        $asignados     = \Corals\Modules\Sorteos\Models\Asignado::where('status', 'active')->pluck('name', 'id')->prepend('— Sin asignar —', '')->all();
+        $statusOptions = collect(\Corals\Modules\Sorteos\Enums\CarteraStatus::cases())->mapWithKeys(fn($c) => [$c->value => $c->label()])->all();
 
         $this->setViewSharedData([
             'title_singular' => trans('Corals::labels.update_title', ['title' => $cartera->getIdentifier()]),
         ]);
 
-        return view('Sorteos::carteras.create_edit')->with(compact('cartera', 'sorteos'));
+        return view('Sorteos::carteras.create_edit')->with(compact('cartera', 'sorteos', 'asignados', 'statusOptions'));
     }
 
     public function update(CarteraRequest $request, Cartera $cartera)
     {
+        if ($this->isLocked($cartera)) {
+            $request->merge(array_intersect_key(
+                $request->all(),
+                array_flip(['asignado_id', 'status', '_token', '_method'])
+            ));
+        }
+
         try {
             $this->carteraService->update($request, $cartera);
 
@@ -91,6 +104,91 @@ class CarterasController extends BaseController
         }
 
         return redirectTo($cartera->getShowURL());
+    }
+
+    public function showGenerate(Request $request)
+    {
+        $sorteos   = Sorteo::pluck('name', 'id');
+        $sorteoId  = $request->input('sorteo_id');
+        $nextStart = $sorteoId ? $this->carteraService->getNextStartNumber((int) $sorteoId) : 1;
+
+        $this->setViewSharedData(['title_singular' => 'Generar Carteras']);
+
+        return view('Sorteos::carteras.generate')->with(compact('sorteos', 'sorteoId', 'nextStart'));
+    }
+
+    public function generate(Request $request)
+    {
+        $request->validate([
+            'sorteo_id'     => 'required|integer|exists:sorteos_sorteos,id',
+            'total_boletos' => 'required|integer|min:10',
+            'start_number'  => 'required|integer|min:1',
+            'code_prefix'   => 'required|string|max:5|alpha',
+        ]);
+
+        if ($request->integer('total_boletos') % 10 !== 0) {
+            return back()->withErrors(['total_boletos' => 'El total debe ser múltiplo de 10.'])->withInput();
+        }
+
+        try {
+            $result = $this->carteraService->generateForSorteo(
+                (int) $request->sorteo_id,
+                (int) $request->total_boletos,
+                (int) $request->start_number,
+                strtoupper($request->code_prefix)
+            );
+
+            flash("Se crearon {$result['created']} carteras ({$result['skipped']} omitidas).")->success();
+        } catch (\Exception $e) {
+            log_exception($e, Cartera::class, 'generate');
+            flash($e->getMessage())->error();
+        }
+
+        return redirect(url($this->resource_url));
+    }
+
+    public function activate(Request $request, Sorteo $sorteo)
+    {
+        try {
+            $count = $this->carteraService->activateCarteras($sorteo->id);
+            flash("{$count} carteras activadas y bloqueadas.")->success();
+        } catch (\Exception $e) {
+            log_exception($e, Cartera::class, 'activate');
+            flash($e->getMessage())->error();
+        }
+
+        return redirect(url($this->resource_url));
+    }
+
+    public function quickStatus(Request $request, Cartera $cartera)
+    {
+        $request->validate(['status' => 'required|string']);
+
+        $status = CarteraStatus::from($request->status);
+
+        // Dates always recalculate on every transition — never frozen
+        $data = match ($status) {
+            CarteraStatus::Asignado  => ['status' => $status->value, 'asignado_at' => $cartera->asignado_at ?? now(), 'entregado_at' => null],
+            CarteraStatus::Entregado => ['status' => $status->value, 'entregado_at' => now()],
+            default                  => ['status' => $status->value, 'asignado_id' => null, 'asignado_at' => null, 'entregado_at' => null],
+        };
+
+        $cartera->update($data);
+        $cartera->refresh();
+
+        return response()->json([
+            'level'        => 'success',
+            'status'       => $status->value,
+            'label'        => $status->label(),
+            'badgeClass'   => $status->badgeClass(),
+            'asignado_at'  => $cartera->asignado_at?->format('d/m/Y H:i'),
+            'entregado_at' => $cartera->entregado_at?->format('d/m/Y H:i'),
+        ]);
+    }
+
+    private function isLocked(Cartera $cartera): bool
+    {
+        return in_array($cartera->status, [CarteraStatus::Active, CarteraStatus::Sold]);
     }
 
     public function downloadTemplate()
@@ -129,6 +227,10 @@ class CarterasController extends BaseController
 
     public function destroy(CarteraRequest $request, Cartera $cartera)
     {
+        if ($this->isLocked($cartera)) {
+            return response()->json(['level' => 'error', 'message' => 'No se puede eliminar una cartera activa o vendida.']);
+        }
+
         try {
             $this->carteraService->destroy($request, $cartera);
 

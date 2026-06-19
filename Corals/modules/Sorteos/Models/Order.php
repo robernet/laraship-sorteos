@@ -4,6 +4,7 @@ namespace Corals\Modules\Sorteos\Models;
 
 use Corals\Foundation\Models\BaseModel;
 use Corals\Foundation\Transformers\PresentableTrait;
+use Corals\Modules\ClubPago\Models\ClubPagoReference;
 use Corals\Modules\Sorteos\Enums\OrderStatus;
 use Corals\Modules\Sorteos\Enums\PaymentMethod;
 use Spatie\Activitylog\Traits\LogsActivity;
@@ -40,6 +41,11 @@ class Order extends BaseModel
     public function boletos()
     {
         return $this->hasManyThrough(Boleto::class, OrderItem::class, 'order_id', 'id', 'id', 'boleto_id');
+    }
+
+    public function clubPagoReference()
+    {
+        return $this->hasOne(ClubPagoReference::class);
     }
 
     public function getIdentifier($key = null): string

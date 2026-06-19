@@ -21,7 +21,7 @@ class SorteosPermissionsDatabaseSeeder extends Seeder
             'name' => 'Administrations::admin.sorteos',
         ];
 
-        $models = ['sorteo', 'cartera', 'boleto', 'order'];
+        $models = ['sorteo', 'cartera', 'boleto', 'order', 'asignado'];
 
         $levels = ['view', 'create', 'update', 'delete', 'restore', 'hardDelete'];
 
