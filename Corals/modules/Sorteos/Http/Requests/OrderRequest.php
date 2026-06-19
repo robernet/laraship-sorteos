@@ -38,4 +38,22 @@ class OrderRequest extends BaseRequest
 
         return $rules;
     }
+
+    public function withValidator(\Illuminate\Validation\Validator $validator): void
+    {
+        if ($this->route()?->getName() !== 'orders.store') {
+            return;
+        }
+
+        $validator->after(function ($v) {
+            $hasBoletos = !empty($this->boleto_ids)
+                || filled($this->boleto_ids_text)
+                || !empty($this->cartera_ids)
+                || filled($this->cartera_codes_text);
+
+            if (!$hasBoletos) {
+                $v->errors()->add('boleto_ids', 'Debe seleccionar al menos una cartera y un boleto.');
+            }
+        });
+    }
 }
