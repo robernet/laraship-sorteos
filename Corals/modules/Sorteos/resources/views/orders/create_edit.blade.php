@@ -56,9 +56,24 @@
                 @if($order->exists)
                     <div class="row">
                         <div class="col-md-12">
-                            <div class="alert alert-info">
-                                {{ trans('Sorteos::attributes.order.boletos_locked') }}
-                            </div>
+                            <label>Boletos</label>
+                            @if($order->items->isEmpty())
+                                <p class="text-muted">Sin boletos registrados.</p>
+                            @else
+                                <table class="table table-sm table-bordered">
+                                    <thead><tr><th>#</th><th>No. Digital</th><th>Cartera</th><th>Estado</th></tr></thead>
+                                    <tbody>
+                                        @foreach($order->items as $i => $item)
+                                            <tr>
+                                                <td>{{ $i + 1 }}</td>
+                                                <td>{{ $item->boleto?->digital_number ?? '—' }}</td>
+                                                <td>{{ $item->boleto?->cartera?->code ?? '—' }}</td>
+                                                <td>{{ $item->boleto?->status?->label() ?? '—' }}</td>
+                                            </tr>
+                                        @endforeach
+                                    </tbody>
+                                </table>
+                            @endif
                         </div>
                     </div>
                 @else

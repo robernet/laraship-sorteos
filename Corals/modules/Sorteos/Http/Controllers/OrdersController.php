@@ -86,6 +86,7 @@ class OrdersController extends BaseController
 
     public function edit(OrderRequest $request, Order $order)
     {
+        $order->load(['items.boleto.cartera']);
         $sorteos = Sorteo::pluck('name', 'id');
         $asignados = Asignado::where('status', 'active')->orderBy('name')->pluck('name', 'id')->prepend('— Sin colaborador —', '');
         $paymentMethods = collect(\Corals\Modules\Sorteos\Enums\PaymentMethod::cases())

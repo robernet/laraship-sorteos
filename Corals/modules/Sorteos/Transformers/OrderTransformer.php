@@ -59,19 +59,19 @@ class OrderTransformer extends BaseTransformer
                 'data-table'   => '.dataTableBuilder',
                 'class'        => 'btn btn-xs btn-success',
                 'title'        => trans('Sorteos::attributes.order.confirm'),
-                'data-confirm' => trans('Corals::labels.confirmation.title'),
+                'data-confirmation' => '¿Confirmar el pago de esta orden?',
             ], '<i class="fa fa-check"></i>');
         }
 
         if (!$order->isCancelled()) {
             $cancelUrl = url(config('sorteos.models.order.resource_url') . '/' . $order->hashed_id . '/cancel');
             $html .= HtmlElement('a', [
-                'href'         => $cancelUrl,
-                'data-action'  => 'post',
-                'data-table'   => '.dataTableBuilder',
-                'class'        => 'btn btn-xs btn-danger',
-                'title'        => trans('Sorteos::attributes.order.cancel'),
-                'data-confirm' => trans('Corals::labels.confirmation.title'),
+                'href'             => $cancelUrl,
+                'data-action'      => 'post',
+                'data-table'       => '.dataTableBuilder',
+                'class'            => 'btn btn-xs btn-danger',
+                'title'            => trans('Sorteos::attributes.order.cancel'),
+                'data-confirmation' => '¿Cancelar esta orden?',
             ], '<i class="fa fa-times"></i>');
         }
 
