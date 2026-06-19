@@ -103,6 +103,76 @@
                             </div>
                         </div>
                     </div>
+
+                    <script>
+                    (function () {
+                        var apiUrl    = '{{ route('sorteos.orders.carteras-by-asignado') }}';
+                        var carteraEl = document.getElementById('cartera-select');
+                        var boletoEl  = document.getElementById('boleto-select');
+                        var dynamic   = document.getElementById('boleto-dynamic');
+                        var manual    = document.getElementById('boleto-manual');
+                        var noAlert   = document.getElementById('no-carteras-alert');
+                        var carterasData = {};
+
+                        function loadCarteras() {
+                            var asignadoId = document.getElementById('asignado_id').value;
+                            var sorteoId   = document.getElementById('sorteo_id').value;
+
+                            if (!asignadoId || !sorteoId) {
+                                dynamic.style.display = 'none';
+                                manual.style.display  = '';
+                                return;
+                            }
+
+                            fetch(apiUrl + '?asignado_id=' + asignadoId + '&sorteo_id=' + sorteoId, {
+                                headers: { 'X-Requested-With': 'XMLHttpRequest' }
+                            })
+                            .then(function(r) { return r.json(); })
+                            .then(function(data) {
+                                carterasData = {};
+                                carteraEl.innerHTML = '<option value="">— Seleccionar cartera —</option>';
+                                boletoEl.innerHTML  = '<option value="" disabled>Selecciona una cartera primero</option>';
+
+                                if (!data.carteras || data.carteras.length === 0) {
+                                    noAlert.style.display = '';
+                                    dynamic.style.display = '';
+                                    manual.style.display  = 'none';
+                                    return;
+                                }
+
+                                noAlert.style.display = 'none';
+                                data.carteras.forEach(function(c) {
+                                    carterasData[c.id] = c.boletos;
+                                    var opt = document.createElement('option');
+                                    opt.value       = c.id;
+                                    opt.textContent = c.code + ' (' + c.boletos.length + ' disponibles)';
+                                    carteraEl.appendChild(opt);
+                                });
+
+                                dynamic.style.display = '';
+                                manual.style.display  = 'none';
+                            });
+                        }
+
+                        carteraEl.addEventListener('change', function () {
+                            var cid = this.value;
+                            boletoEl.innerHTML = '';
+                            if (!cid || !carterasData[cid]) {
+                                boletoEl.innerHTML = '<option value="" disabled>Selecciona una cartera primero</option>';
+                                return;
+                            }
+                            carterasData[cid].forEach(function(b) {
+                                var opt = document.createElement('option');
+                                opt.value       = b.id;
+                                opt.textContent = 'Boleto #' + b.number;
+                                boletoEl.appendChild(opt);
+                            });
+                        });
+
+                        document.getElementById('asignado_id').addEventListener('change', loadCarteras);
+                        document.getElementById('sorteo_id').addEventListener('change', loadCarteras);
+                    })();
+                    </script>
                 @endif
 
                 <div class="row">
@@ -125,77 +195,3 @@
     </div>
 @endsection
 
-@if(!$order->exists)
-@push('js')
-<script>
-(function () {
-    var apiUrl    = '{{ route('sorteos.orders.carteras-by-asignado') }}';
-    var carteraEl = document.getElementById('cartera-select');
-    var boletoEl  = document.getElementById('boleto-select');
-    var dynamic   = document.getElementById('boleto-dynamic');
-    var manual    = document.getElementById('boleto-manual');
-    var noAlert   = document.getElementById('no-carteras-alert');
-
-    var carterasData = {};
-
-    function loadCarteras() {
-        var asignadoId = document.getElementById('asignado_id').value;
-        var sorteoId   = document.getElementById('sorteo_id').value;
-
-        if (!asignadoId || !sorteoId) {
-            dynamic.style.display = 'none';
-            manual.style.display  = '';
-            return;
-        }
-
-        fetch(apiUrl + '?asignado_id=' + asignadoId + '&sorteo_id=' + sorteoId, {
-            headers: { 'X-Requested-With': 'XMLHttpRequest' }
-        })
-        .then(function(r) { return r.json(); })
-        .then(function(data) {
-            carterasData = {};
-            carteraEl.innerHTML = '<option value="">— Seleccionar cartera —</option>';
-            boletoEl.innerHTML  = '<option value="" disabled>Selecciona una cartera primero</option>';
-
-            if (!data.carteras || data.carteras.length === 0) {
-                noAlert.style.display = '';
-                dynamic.style.display = '';
-                manual.style.display  = 'none';
-                return;
-            }
-
-            noAlert.style.display = 'none';
-            data.carteras.forEach(function(c) {
-                carterasData[c.id] = c.boletos;
-                var opt = document.createElement('option');
-                opt.value       = c.id;
-                opt.textContent = c.code + ' (' + c.boletos.length + ' disponibles)';
-                carteraEl.appendChild(opt);
-            });
-
-            dynamic.style.display = '';
-            manual.style.display  = 'none';
-        });
-    }
-
-    carteraEl.addEventListener('change', function () {
-        var cid = this.value;
-        boletoEl.innerHTML = '';
-        if (!cid || !carterasData[cid]) {
-            boletoEl.innerHTML = '<option value="" disabled>Selecciona una cartera primero</option>';
-            return;
-        }
-        carterasData[cid].forEach(function(b) {
-            var opt = document.createElement('option');
-            opt.value       = b.id;
-            opt.textContent = 'Boleto #' + b.number;
-            boletoEl.appendChild(opt);
-        });
-    });
-
-    document.getElementById('asignado_id').addEventListener('change', loadCarteras);
-    document.getElementById('sorteo_id').addEventListener('change', loadCarteras);
-})();
-</script>
-@endpush
-@endif
