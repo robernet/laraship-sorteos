@@ -18,7 +18,7 @@ class OrderRequest extends BaseRequest
     {
         $rules = parent::rules();
 
-        if ($this->isStore()) {
+        if ($this->isStore() && $this->route()?->getName() === 'orders.store') {
             $rules['sorteo_id']      = 'required|integer|exists:sorteos_sorteos,id';
             $rules['asignado_id']    = 'nullable|integer|exists:sorteos_carteras_asignadas,id';
             $rules['buyer_name']     = 'required|string|max:255';
