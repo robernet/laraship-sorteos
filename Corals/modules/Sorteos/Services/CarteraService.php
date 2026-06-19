@@ -110,12 +110,21 @@ class CarteraService extends BaseServiceClass
     public function generateForSorteo(int $sorteoId, int $totalBoletos, int $startNumber, string $prefix): array
     {
         $numCarteras = (int) ceil($totalBoletos / self::TICKETS_PER_WALLET);
-        $padding     = max(3, strlen((string) $numCarteras));
         $created     = 0;
         $skipped     = 0;
 
+        // Find highest existing sequence for this prefix so codes never restart at 001
+        $existingMax = Cartera::where('sorteo_id', $sorteoId)
+            ->where('code', 'like', $prefix . '%')
+            ->get()
+            ->map(fn($c) => (int) ltrim(substr($c->code, strlen($prefix)), '0') ?: 0)
+            ->max() ?? 0;
+
+        $padding = max(3, strlen((string) ($existingMax + $numCarteras)));
+
         for ($i = 1; $i <= $numCarteras; $i++) {
-            $code       = $prefix . str_pad($i, $padding, '0', STR_PAD_LEFT);
+            $seq        = $existingMax + $i;
+            $code       = $prefix . str_pad($seq, $padding, '0', STR_PAD_LEFT);
             $physStart  = $startNumber + (($i - 1) * self::TICKETS_PER_WALLET);
             $physEnd    = $physStart + self::TICKETS_PER_WALLET - 1;
 
