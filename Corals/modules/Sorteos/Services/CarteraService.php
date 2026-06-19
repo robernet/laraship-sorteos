@@ -97,7 +97,6 @@ class CarteraService extends BaseServiceClass
         $isProtected = in_array($cartera->status, [
             CarteraStatus::Asignado,
             CarteraStatus::Entregado,
-            CarteraStatus::Active,
         ]);
 
         if ($total > 0 && $taken === $total) {
@@ -155,13 +154,6 @@ class CarteraService extends BaseServiceClass
         }
 
         return compact('created', 'skipped', 'numCarteras');
-    }
-
-    public function activateCarteras(int $sorteoId): int
-    {
-        return Cartera::where('sorteo_id', $sorteoId)
-            ->whereNotIn('status', [CarteraStatus::Sold->value, CarteraStatus::Active->value])
-            ->update(['status' => CarteraStatus::Active->value, 'updated_at' => now()]);
     }
 
     public function getNextStartNumber(int $sorteoId): int

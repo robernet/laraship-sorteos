@@ -147,19 +147,6 @@ class CarterasController extends BaseController
         return redirect(url($this->resource_url));
     }
 
-    public function activate(Request $request, Sorteo $sorteo)
-    {
-        try {
-            $count = $this->carteraService->activateCarteras($sorteo->id);
-            flash("{$count} carteras activadas y bloqueadas.")->success();
-        } catch (\Exception $e) {
-            log_exception($e, Cartera::class, 'activate');
-            flash($e->getMessage())->error();
-        }
-
-        return redirect(url($this->resource_url));
-    }
-
     public function quickStatus(Request $request, Cartera $cartera)
     {
         $request->validate(['status' => 'required|string']);
@@ -204,7 +191,7 @@ class CarterasController extends BaseController
 
     private function isLocked(Cartera $cartera): bool
     {
-        return in_array($cartera->status, [CarteraStatus::Active, CarteraStatus::Sold]);
+        return in_array($cartera->status, [CarteraStatus::Sold, CarteraStatus::Asignado, CarteraStatus::Entregado]);
     }
 
     public function downloadTemplate()

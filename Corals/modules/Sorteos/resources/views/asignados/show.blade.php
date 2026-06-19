@@ -143,11 +143,11 @@
                     <td>
                         @php
                             $transitions = match($cartera->status?->value) {
-                                'active', 'available' => ['asignado' => 'Asignar'],
-                                'asignado'            => ['entregado' => 'Marcar Entregada', 'active' => 'Revertir a Activa'],
-                                'entregado'           => ['asignado' => 'Revertir a Asignado'],
-                                'sold'                => ['entregado' => 'Registrar Entrega'],
-                                default               => [],
+                                'available'  => ['asignado' => 'Asignar'],
+                                'asignado'   => ['entregado' => 'Marcar Entregada', 'available' => 'Revertir a Disponible'],
+                                'entregado'  => ['asignado' => 'Revertir a Asignado'],
+                                'sold'       => ['entregado' => 'Registrar Entrega'],
+                                default      => [],
                             };
                         @endphp
                         @if($transitions)

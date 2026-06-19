@@ -18,7 +18,6 @@ Route::group(['prefix' => 'sorteos'], function () {
 
     Route::get('carteras/generate', 'CarterasController@showGenerate')->name('sorteos.carteras.generate');
     Route::post('carteras/generate', 'CarterasController@generate')->name('sorteos.carteras.do-generate');
-    Route::post('carteras/{sorteo}/activate', 'CarterasController@activate')->name('sorteos.carteras.activate');
     Route::post('carteras/{cartera}/quick-status', 'CarterasController@quickStatus')->name('sorteos.carteras.quick-status');
     Route::get('carteras/import/template', 'CarterasController@downloadTemplate')->name('sorteos.carteras.import.template');
     Route::post('carteras/import', 'CarterasController@importCsv')->name('sorteos.carteras.import');

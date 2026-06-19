@@ -58,7 +58,7 @@ class AsignadosController extends BaseController
 
         $sorteos           = Sorteo::pluck('name', 'id');
         $assignableCarteras = Cartera::whereNull('asignado_id')
-            ->whereIn('status', [CarteraStatus::Available->value, CarteraStatus::Active->value])
+            ->where('status', CarteraStatus::Available->value)
             ->with('sorteo')
             ->orderBy('sorteo_id')
             ->orderBy('code')
