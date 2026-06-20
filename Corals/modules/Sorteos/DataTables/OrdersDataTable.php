@@ -20,7 +20,7 @@ class OrdersDataTable extends BaseDataTable
 
     public function query(Order $model)
     {
-        return $model->newQuery()->with('sorteo')->withCount('items');
+        return $model->newQuery()->with(['sorteo', 'colaborador'])->withCount('items');
     }
 
     protected function getColumns()
@@ -32,6 +32,7 @@ class OrdersDataTable extends BaseDataTable
             'buyer_email'    => ['title' => trans('Sorteos::attributes.order.buyer_email')],
             'buyer_phone'    => ['title' => trans('Sorteos::attributes.order.buyer_phone')],
             'sorteo'         => ['title' => trans('Sorteos::attributes.order.sorteo_id'), 'orderable' => false, 'searchable' => false],
+            'colaborador'    => ['title' => trans('Sorteos::attributes.order.colaborador_id'), 'orderable' => false, 'searchable' => false],
             'payment_method' => ['title' => trans('Sorteos::attributes.order.payment_method'), 'orderable' => false, 'searchable' => false],
             'status'         => ['title' => trans('Sorteos::attributes.order.status')],
             'total_amount'   => ['title' => trans('Sorteos::attributes.order.total_amount')],

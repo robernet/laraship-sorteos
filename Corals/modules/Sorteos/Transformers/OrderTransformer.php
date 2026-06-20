@@ -35,6 +35,9 @@ class OrderTransformer extends BaseTransformer
             'buyer_email'    => $order->buyer_email,
             'buyer_phone'    => $order->buyer_phone,
             'sorteo'         => $order->sorteo?->name ?? '-',
+            'colaborador'    => $order->colaborador
+                ? HtmlElement('a', ['href' => url('sorteos/colaboradores/' . $order->colaborador->hashed_id)], $order->colaborador->name)
+                : '—',
             'payment_method' => $order->payment_method?->label() ?? '-',
             'status'         => $statusBadge,
             'total_amount'   => '$' . number_format($order->total_amount, 2),
