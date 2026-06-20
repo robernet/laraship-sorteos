@@ -53,7 +53,7 @@ class CarterasDataTable extends BaseDataTable
                 'title'   => trans('Sorteos::attributes.cartera.status'),
                 'class'   => 'col-md-3',
                 'type'    => 'select',
-                'options' => collect(\Corals\Modules\Sorteos\Enums\CarteraStatus::cases())
+                'options' => ['' => '— Todos —'] + collect(\Corals\Modules\Sorteos\Enums\CarteraStatus::cases())
                     ->mapWithKeys(fn($case) => [$case->value => $case->label()])
                     ->all(),
                 'active'  => true,
