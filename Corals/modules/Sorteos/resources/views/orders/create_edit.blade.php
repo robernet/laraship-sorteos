@@ -15,7 +15,7 @@
     @parent
     <div class="row">
 
-        {{-- Columna izquierda: formulario --}}
+        {{-- Columna izquierda: campos del formulario --}}
         <div class="{{ $order->exists ? 'col-md-8' : 'col-md-12' }}">
             @component('components.box')
                 {!! CoralsForm::openForm($order) !!}
@@ -52,20 +52,8 @@
                     </div>
                 </div>
 
-                {{-- Sección de Pago --}}
-                <hr>
-                <h6 class="text-muted text-uppercase mb-3"><i class="fa fa-credit-card"></i> Pago</h6>
-                <div class="row">
-                    <div class="col-md-6">
-                        {!! CoralsForm::select('payment_method', 'Sorteos::attributes.order.payment_method', $paymentMethods, true, $order->payment_method?->value) !!}
-                    </div>
-                    <div class="col-md-6">
-                        {!! CoralsForm::text('payment_reference', 'Sorteos::attributes.order.payment_reference', false, $order->payment_reference, ['placeholder' => 'Folio, No. transferencia, etc.']) !!}
-                    </div>
-                </div>
-                <hr>
-
                 @if($order->exists)
+                    {{-- Boletos: solo lectura --}}
                     <div class="row">
                         <div class="col-md-12">
                             <label>Boletos</label>
@@ -144,13 +132,11 @@
                         function loadCarteras() {
                             var colaboradorId = document.getElementById('colaborador_id').value;
                             var sorteoId      = document.getElementById('sorteo_id').value;
-
                             if (!colaboradorId || !sorteoId) {
                                 dynamic.style.display = 'none';
                                 manual.style.display  = '';
                                 return;
                             }
-
                             fetch(apiUrl + '?colaborador_id=' + colaboradorId + '&sorteo_id=' + sorteoId, {
                                 headers: { 'X-Requested-With': 'XMLHttpRequest' }
                             })
@@ -159,14 +145,12 @@
                                 carterasData = {};
                                 carteraEl.innerHTML = '<option value="">— Seleccionar cartera —</option>';
                                 boletoEl.innerHTML  = '<option value="" disabled>Selecciona una cartera primero</option>';
-
                                 if (!data.carteras || data.carteras.length === 0) {
                                     noAlert.style.display = '';
                                     dynamic.style.display = '';
                                     manual.style.display  = 'none';
                                     return;
                                 }
-
                                 noAlert.style.display = 'none';
                                 data.carteras.forEach(function(c) {
                                     carterasData[c.id] = c.boletos;
@@ -175,7 +159,6 @@
                                     opt.textContent = c.code + ' (' + c.boletos.length + ' disponibles)';
                                     carteraEl.appendChild(opt);
                                 });
-
                                 dynamic.style.display = '';
                                 manual.style.display  = 'none';
                             });
@@ -220,33 +203,57 @@
             @endcomponent
         </div>
 
-        {{-- Columna derecha: estado y acciones (solo al editar) --}}
+        {{-- Columna derecha: Pago + acciones (solo al editar) --}}
         @if($order->exists)
         <div class="col-md-4">
             <div class="card">
-                <div class="card-header"><strong>Estado</strong></div>
-                <div class="card-body">
+                <div class="card-header">
+                    <strong>Estado</strong>
                     @if($order->status)
-                        <p><span class="badge {{ $order->status->badgeClass() }} badge-pill" style="font-size:1em">
+                        <span class="badge {{ $order->status->badgeClass() }} float-right" style="font-size:.9em; margin-top:2px">
                             {{ $order->status->label() }}
-                        </span></p>
+                        </span>
                     @endif
+                </div>
+                <div class="card-body">
+
+                    {{-- Sección Pago: campos asociados al formulario principal vía atributo form= --}}
+                    <h6 class="text-muted text-uppercase mb-3"><i class="fa fa-credit-card"></i> Pago</h6>
+
+                    <div class="form-group">
+                        <label>{{ trans('Sorteos::attributes.order.payment_method') }}</label>
+                        <select name="payment_method" form="order-edit-form" class="form-control">
+                            @foreach($paymentMethods as $value => $label)
+                                <option value="{{ $value }}" {{ $order->payment_method?->value === $value ? 'selected' : '' }}>
+                                    {{ $label }}
+                                </option>
+                            @endforeach
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>{{ trans('Sorteos::attributes.order.payment_reference') }}</label>
+                        <input type="text" name="payment_reference" form="order-edit-form"
+                               class="form-control" placeholder="Folio, No. transferencia, etc."
+                               value="{{ $order->payment_reference }}">
+                    </div>
+
+                    <hr>
+
+                    {{-- Botón Guardar (submit del form principal) --}}
+                    <button type="submit" form="order-edit-form" class="btn btn-primary btn-block mb-3">
+                        <i class="fa fa-save"></i> Guardar
+                    </button>
 
                     @if($order->isPending())
-                        <form method="POST" action="{{ route('sorteos.orders.confirm', $order->hashed_id) }}" class="mb-2">
-                            @csrf
-                            <button type="submit" class="btn btn-success btn-block"
-                                    onclick="return confirm('¿Confirmar el pago de esta orden?')">
-                                <i class="fa fa-check"></i> Confirmar Pago
-                            </button>
-                        </form>
-                        <form method="POST" action="{{ route('sorteos.orders.cancel', $order->hashed_id) }}">
-                            @csrf
-                            <button type="submit" class="btn btn-danger btn-block"
-                                    onclick="return confirm('¿Cancelar esta orden? Los boletos quedarán disponibles nuevamente.')">
-                                <i class="fa fa-times"></i> Cancelar Orden
-                            </button>
-                        </form>
+                        <button type="button" class="btn btn-success btn-block mb-2"
+                                onclick="orderAction('{{ route('sorteos.orders.confirm', $order->hashed_id) }}', '¿Confirmar el pago de esta orden?')">
+                            <i class="fa fa-check"></i> Confirmar Pago
+                        </button>
+                        <button type="button" class="btn btn-danger btn-block"
+                                onclick="orderAction('{{ route('sorteos.orders.cancel', $order->hashed_id) }}', '¿Cancelar esta orden? Los boletos quedarán disponibles nuevamente.')">
+                            <i class="fa fa-times"></i> Cancelar Orden
+                        </button>
                     @endif
 
                     @if($order->isConfirmed())
@@ -257,9 +264,34 @@
                             <i class="fa fa-envelope"></i> Reenviar Email
                         </button>
                     @endif
+
                 </div>
             </div>
         </div>
+
+        <script>
+        // Give the main form a known ID so we can reference it from the right column
+        document.addEventListener('DOMContentLoaded', function () {
+            var forms = document.querySelectorAll('form');
+            for (var i = 0; i < forms.length; i++) {
+                if (forms[i].action.indexOf('/orders/') !== -1) {
+                    forms[i].id = 'order-edit-form';
+                    break;
+                }
+            }
+        });
+
+        // Submit the main form to a different action URL (confirm / cancel)
+        function orderAction(url, msg) {
+            if (!confirm(msg)) { return; }
+            var form = document.getElementById('order-edit-form');
+            // Remove _method spoofing so the request goes as plain POST
+            var m = form.querySelector('input[name="_method"]');
+            if (m) { m.parentNode.removeChild(m); }
+            form.action = url;
+            form.submit();
+        }
+        </script>
         @endif
 
     </div>

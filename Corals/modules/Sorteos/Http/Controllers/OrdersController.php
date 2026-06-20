@@ -157,6 +157,7 @@ class OrdersController extends BaseController
     public function confirmOrder(OrderRequest $request, Order $order)
     {
         try {
+            $order->fill($request->only(['payment_method', 'payment_reference']))->save();
             $this->orderService->confirmOrder($order);
             flash('Orden confirmada correctamente.')->success();
         } catch (\Exception $exception) {
