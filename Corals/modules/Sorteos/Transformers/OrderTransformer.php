@@ -28,7 +28,7 @@ class OrderTransformer extends BaseTransformer
 
         $transformedArray = [
             'id'             => $order->id,
-            'hashed_id'      => HtmlElement('a', ['href' => $order->getShowURL()], '#' . $order->hashed_id),
+            'hashed_id'      => HtmlElement('a', ['href' => $order->getShowURL()], $order->hashed_id),
             'buyer_name'     => $order->buyer_name,
             'buyer_email'    => $order->buyer_email,
             'buyer_phone'    => $order->buyer_phone,

@@ -43,22 +43,42 @@ class OrdersDataTable extends BaseDataTable
 
     public function getFilters()
     {
+        $colaboradores = ['' => '— Todos —'] + \Corals\Modules\Sorteos\Models\Colaborador::orderBy('name')
+            ->pluck('name', 'id')
+            ->all();
+
         return [
-            'buyer_name'  => [
+            'buyer_name'     => [
                 'title'     => trans('Sorteos::attributes.order.buyer_name'),
                 'class'     => 'col-md-3',
                 'type'      => 'text',
                 'condition' => 'like',
                 'active'    => true,
             ],
-            'buyer_email' => [
+            'buyer_email'    => [
                 'title'     => trans('Sorteos::attributes.order.buyer_email'),
                 'class'     => 'col-md-3',
                 'type'      => 'text',
                 'condition' => 'like',
                 'active'    => true,
             ],
-            'status'      => [
+            'colaborador_id' => [
+                'title'   => trans('Sorteos::attributes.order.colaborador_id'),
+                'class'   => 'col-md-3',
+                'type'    => 'select',
+                'options' => $colaboradores,
+                'active'  => true,
+            ],
+            'payment_method' => [
+                'title'   => trans('Sorteos::attributes.order.payment_method'),
+                'class'   => 'col-md-3',
+                'type'    => 'select',
+                'options' => ['' => '— Todos —'] + collect(\Corals\Modules\Sorteos\Enums\PaymentMethod::cases())
+                    ->mapWithKeys(fn($case) => [$case->value => $case->label()])
+                    ->all(),
+                'active'  => true,
+            ],
+            'status'         => [
                 'title'   => trans('Sorteos::attributes.order.status'),
                 'class'   => 'col-md-3',
                 'type'    => 'select',
