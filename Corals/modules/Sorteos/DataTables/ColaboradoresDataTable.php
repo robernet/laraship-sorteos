@@ -41,20 +41,17 @@ class ColaboradoresDataTable extends BaseDataTable
     {
         return [
             'name'   => [
-                'title'     => trans('Sorteos::attributes.colaborador.name'),
                 'class'     => 'col-md-4',
                 'type'      => 'text',
                 'condition' => 'like',
                 'active'    => true,
+                'html'      => \CoralsForm::text('name', trans('Sorteos::attributes.colaborador.name'), false, request('name'), ['class' => 'filter']),
             ],
             'status' => [
-                'title'   => trans('Sorteos::attributes.colaborador.status'),
-                'class'   => 'col-md-3',
-                'type'    => 'select',
-                'options' => collect(\Corals\Modules\Sorteos\Enums\ColaboradorStatus::cases())
-                    ->mapWithKeys(fn($c) => [$c->value => $c->label()])
-                    ->all(),
-                'active'  => true,
+                'class'  => 'col-md-3',
+                'type'   => 'select',
+                'active' => true,
+                'html'   => \CoralsForm::select('status', trans('Sorteos::attributes.colaborador.status'), ['' => '— Todos —'] + collect(\Corals\Modules\Sorteos\Enums\ColaboradorStatus::cases())->mapWithKeys(fn($c) => [$c->value => $c->label()])->all(), false, request('status'), ['class' => 'filter']),
             ],
         ];
     }

@@ -43,20 +43,17 @@ class CarterasDataTable extends BaseDataTable
     {
         return [
             'code'   => [
-                'title'     => trans('Sorteos::attributes.cartera.code'),
                 'class'     => 'col-md-3',
                 'type'      => 'text',
                 'condition' => 'like',
                 'active'    => true,
+                'html'      => \CoralsForm::text('code', trans('Sorteos::attributes.cartera.code'), false, request('code'), ['class' => 'filter']),
             ],
             'status' => [
-                'title'   => trans('Sorteos::attributes.cartera.status'),
-                'class'   => 'col-md-3',
-                'type'    => 'select',
-                'options' => ['' => '— Todos —'] + collect(\Corals\Modules\Sorteos\Enums\CarteraStatus::cases())
-                    ->mapWithKeys(fn($case) => [$case->value => $case->label()])
-                    ->all(),
-                'active'  => true,
+                'class'  => 'col-md-3',
+                'type'   => 'select',
+                'active' => true,
+                'html'   => \CoralsForm::select('status', trans('Sorteos::attributes.cartera.status'), ['' => '— Todos —'] + collect(\Corals\Modules\Sorteos\Enums\CarteraStatus::cases())->mapWithKeys(fn($c) => [$c->value => $c->label()])->all(), false, request('status'), ['class' => 'filter']),
             ],
         ];
     }

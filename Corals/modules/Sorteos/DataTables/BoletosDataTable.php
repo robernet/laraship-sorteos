@@ -40,20 +40,17 @@ class BoletosDataTable extends BaseDataTable
     {
         return [
             'digital_number' => [
-                'title'     => trans('Sorteos::attributes.boleto.digital_number'),
                 'class'     => 'col-md-3',
                 'type'      => 'text',
                 'condition' => '=',
                 'active'    => true,
+                'html'      => \CoralsForm::text('digital_number', trans('Sorteos::attributes.boleto.digital_number'), false, request('digital_number'), ['class' => 'filter']),
             ],
             'status'         => [
-                'title'   => trans('Sorteos::attributes.boleto.status'),
-                'class'   => 'col-md-3',
-                'type'    => 'select',
-                'options' => ['' => '— Todos —'] + collect(\Corals\Modules\Sorteos\Enums\BoletoStatus::cases())
-                    ->mapWithKeys(fn($case) => [$case->value => $case->label()])
-                    ->all(),
-                'active'  => true,
+                'class'  => 'col-md-3',
+                'type'   => 'select',
+                'active' => true,
+                'html'   => \CoralsForm::select('status', trans('Sorteos::attributes.boleto.status'), ['' => '— Todos —'] + collect(\Corals\Modules\Sorteos\Enums\BoletoStatus::cases())->mapWithKeys(fn($c) => [$c->value => $c->label()])->all(), false, request('status'), ['class' => 'filter']),
             ],
         ];
     }

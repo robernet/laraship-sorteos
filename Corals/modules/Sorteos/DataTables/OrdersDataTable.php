@@ -47,45 +47,44 @@ class OrdersDataTable extends BaseDataTable
             ->pluck('name', 'id')
             ->all();
 
+        $paymentOptions = ['' => '— Todos —'] + collect(\Corals\Modules\Sorteos\Enums\PaymentMethod::cases())
+            ->mapWithKeys(fn($c) => [$c->value => $c->label()])->all();
+
+        $statusOptions = ['' => '— Todos —'] + collect(\Corals\Modules\Sorteos\Enums\OrderStatus::cases())
+            ->mapWithKeys(fn($c) => [$c->value => $c->label()])->all();
+
         return [
             'buyer_name'     => [
-                'title'     => trans('Sorteos::attributes.order.buyer_name'),
                 'class'     => 'col-md-3',
                 'type'      => 'text',
                 'condition' => 'like',
                 'active'    => true,
+                'html'      => \CoralsForm::text('buyer_name', trans('Sorteos::attributes.order.buyer_name'), false, request('buyer_name'), ['class' => 'filter']),
             ],
             'buyer_email'    => [
-                'title'     => trans('Sorteos::attributes.order.buyer_email'),
                 'class'     => 'col-md-3',
                 'type'      => 'text',
                 'condition' => 'like',
                 'active'    => true,
+                'html'      => \CoralsForm::text('buyer_email', trans('Sorteos::attributes.order.buyer_email'), false, request('buyer_email'), ['class' => 'filter']),
             ],
             'colaborador_id' => [
-                'title'   => trans('Sorteos::attributes.order.colaborador_id'),
-                'class'   => 'col-md-3',
-                'type'    => 'select',
-                'options' => $colaboradores,
-                'active'  => true,
+                'class'  => 'col-md-3',
+                'type'   => 'select',
+                'active' => true,
+                'html'   => \CoralsForm::select('colaborador_id', trans('Sorteos::attributes.order.colaborador_id'), $colaboradores, false, request('colaborador_id'), ['class' => 'filter']),
             ],
             'payment_method' => [
-                'title'   => trans('Sorteos::attributes.order.payment_method'),
-                'class'   => 'col-md-3',
-                'type'    => 'select',
-                'options' => ['' => '— Todos —'] + collect(\Corals\Modules\Sorteos\Enums\PaymentMethod::cases())
-                    ->mapWithKeys(fn($case) => [$case->value => $case->label()])
-                    ->all(),
-                'active'  => true,
+                'class'  => 'col-md-3',
+                'type'   => 'select',
+                'active' => true,
+                'html'   => \CoralsForm::select('payment_method', trans('Sorteos::attributes.order.payment_method'), $paymentOptions, false, request('payment_method'), ['class' => 'filter']),
             ],
             'status'         => [
-                'title'   => trans('Sorteos::attributes.order.status'),
-                'class'   => 'col-md-3',
-                'type'    => 'select',
-                'options' => ['' => '— Todos —'] + collect(\Corals\Modules\Sorteos\Enums\OrderStatus::cases())
-                    ->mapWithKeys(fn($case) => [$case->value => $case->label()])
-                    ->all(),
-                'active'  => true,
+                'class'  => 'col-md-3',
+                'type'   => 'select',
+                'active' => true,
+                'html'   => \CoralsForm::select('status', trans('Sorteos::attributes.order.status'), $statusOptions, false, request('status'), ['class' => 'filter']),
             ],
         ];
     }

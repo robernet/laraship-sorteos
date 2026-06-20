@@ -62,21 +62,18 @@ class SorteosDataTable extends BaseDataTable
     public function getFilters()
     {
         return [
-            'name'      => [
-                'title'     => trans('Sorteos::attributes.sorteo.name'),
+            'name'   => [
                 'class'     => 'col-md-3',
                 'type'      => 'text',
                 'condition' => 'like',
                 'active'    => true,
+                'html'      => \CoralsForm::text('name', trans('Sorteos::attributes.sorteo.name'), false, request('name'), ['class' => 'filter']),
             ],
-            'status'    => [
-                'title'   => trans('Sorteos::attributes.sorteo.status'),
-                'class'   => 'col-md-3',
-                'type'    => 'select',
-                'options' => ['' => '— Todos —'] + collect(\Corals\Modules\Sorteos\Enums\SorteoStatus::cases())
-                    ->mapWithKeys(fn($case) => [$case->value => $case->label()])
-                    ->all(),
-                'active'  => true,
+            'status' => [
+                'class'  => 'col-md-3',
+                'type'   => 'select',
+                'active' => true,
+                'html'   => \CoralsForm::select('status', trans('Sorteos::attributes.sorteo.status'), ['' => '— Todos —'] + collect(\Corals\Modules\Sorteos\Enums\SorteoStatus::cases())->mapWithKeys(fn($c) => [$c->value => $c->label()])->all(), false, request('status'), ['class' => 'filter']),
             ],
         ];
     }
