@@ -18,6 +18,12 @@ class OrderRequest extends BaseRequest
     {
         $rules = parent::rules();
 
+        if ($this->isUpdate()) {
+            $rules['payment_method']    = 'nullable|string|in:' . implode(',', array_column(PaymentMethod::cases(), 'value'));
+            $rules['payment_reference'] = 'nullable|string|max:255';
+            $rules['colaborador_id']    = 'nullable|integer|exists:sorteos_colaboradores,id';
+        }
+
         if ($this->isStore() && $this->route()?->getName() === 'orders.store') {
             $rules['sorteo_id']      = 'required|integer|exists:sorteos_sorteos,id';
             $rules['colaborador_id'] = 'nullable|integer|exists:sorteos_colaboradores,id';

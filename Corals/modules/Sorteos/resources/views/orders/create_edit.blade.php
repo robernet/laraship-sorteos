@@ -14,20 +14,19 @@
 @section('content')
     @parent
     <div class="row">
-        <div class="col-md-12">
+
+        {{-- Columna izquierda: formulario --}}
+        <div class="{{ $order->exists ? 'col-md-8' : 'col-md-12' }}">
             @component('components.box')
                 {!! CoralsForm::openForm($order) !!}
 
-                {{-- Sorteo, Colaborador y método de pago --}}
+                {{-- Sorteo y Colaborador --}}
                 <div class="row">
-                    <div class="col-md-4">
+                    <div class="col-md-6">
                         {!! CoralsForm::select('sorteo_id', 'Sorteos::attributes.order.sorteo_id', $sorteos, true, $order->sorteo_id, ['id' => 'sorteo_id']) !!}
                     </div>
-                    <div class="col-md-4">
+                    <div class="col-md-6">
                         {!! CoralsForm::select('colaborador_id', 'Sorteos::attributes.order.colaborador_id', $colaboradores, false, $order->colaborador_id, ['id' => 'colaborador_id']) !!}
-                    </div>
-                    <div class="col-md-4">
-                        {!! CoralsForm::select('payment_method', 'Sorteos::attributes.order.payment_method', $paymentMethods, true, $order->payment_method?->value) !!}
                     </div>
                 </div>
 
@@ -52,6 +51,19 @@
                         {!! CoralsForm::text('buyer_state', 'Sorteos::attributes.order.buyer_state', false, $order->buyer_state) !!}
                     </div>
                 </div>
+
+                {{-- Sección de Pago --}}
+                <hr>
+                <h6 class="text-muted text-uppercase mb-3"><i class="fa fa-credit-card"></i> Pago</h6>
+                <div class="row">
+                    <div class="col-md-6">
+                        {!! CoralsForm::select('payment_method', 'Sorteos::attributes.order.payment_method', $paymentMethods, true, $order->payment_method?->value) !!}
+                    </div>
+                    <div class="col-md-6">
+                        {!! CoralsForm::text('payment_reference', 'Sorteos::attributes.order.payment_reference', false, $order->payment_reference, ['placeholder' => 'Folio, No. transferencia, etc.']) !!}
+                    </div>
+                </div>
+                <hr>
 
                 @if($order->exists)
                     <div class="row">
@@ -207,6 +219,48 @@
                 {!! CoralsForm::closeForm($order) !!}
             @endcomponent
         </div>
+
+        {{-- Columna derecha: estado y acciones (solo al editar) --}}
+        @if($order->exists)
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header"><strong>Estado</strong></div>
+                <div class="card-body">
+                    @if($order->status)
+                        <p><span class="badge {{ $order->status->badgeClass() }} badge-pill" style="font-size:1em">
+                            {{ $order->status->label() }}
+                        </span></p>
+                    @endif
+
+                    @if($order->isPending())
+                        <form method="POST" action="{{ route('sorteos.orders.confirm', $order->hashed_id) }}" class="mb-2">
+                            @csrf
+                            <button type="submit" class="btn btn-success btn-block"
+                                    onclick="return confirm('¿Confirmar el pago de esta orden?')">
+                                <i class="fa fa-check"></i> Confirmar Pago
+                            </button>
+                        </form>
+                        <form method="POST" action="{{ route('sorteos.orders.cancel', $order->hashed_id) }}">
+                            @csrf
+                            <button type="submit" class="btn btn-danger btn-block"
+                                    onclick="return confirm('¿Cancelar esta orden? Los boletos quedarán disponibles nuevamente.')">
+                                <i class="fa fa-times"></i> Cancelar Orden
+                            </button>
+                        </form>
+                    @endif
+
+                    @if($order->isConfirmed())
+                        <button class="btn btn-info btn-block"
+                                data-action="post"
+                                data-request-data='{"_token":"{{ csrf_token() }}"}'
+                                data-href="{{ route('sorteos.orders.resend', $order->hashed_id) }}">
+                            <i class="fa fa-envelope"></i> Reenviar Email
+                        </button>
+                    @endif
+                </div>
+            </div>
+        </div>
+        @endif
+
     </div>
 @endsection
-

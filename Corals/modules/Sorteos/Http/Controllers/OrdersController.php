@@ -158,13 +158,13 @@ class OrdersController extends BaseController
     {
         try {
             $this->orderService->confirmOrder($order);
-            $message = ['level' => 'success', 'message' => trans('Corals::messages.success.updated', ['item' => $this->title_singular])];
+            flash('Orden confirmada correctamente.')->success();
         } catch (\Exception $exception) {
             log_exception($exception, Order::class, 'confirmOrder');
-            $message = ['level' => 'error', 'message' => $exception->getMessage()];
+            flash($exception->getMessage())->error();
         }
 
-        return response()->json($message);
+        return redirect()->back();
     }
 
     public function cancelOrder(OrderRequest $request, Order $order)
