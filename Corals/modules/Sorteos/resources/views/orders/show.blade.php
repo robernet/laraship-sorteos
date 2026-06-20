@@ -12,29 +12,30 @@
 @endsection
 
 @section('content')
+    <div class="mb-3">
+        @if($order->isPending())
+            <button class="btn btn-success" data-toggle="modal" data-target="#payModal">
+                <i class="fa fa-credit-card"></i> Registrar Pago
+            </button>
+            <button class="btn btn-danger" data-toggle="modal" data-target="#cancelModal">
+                <i class="fa fa-times"></i> Cancelar Orden
+            </button>
+        @endif
+        @if($order->isConfirmed())
+            <button class="btn btn-info"
+                    data-action="post"
+                    data-request-data='{"_token":"{{ csrf_token() }}"}'
+                    data-href="{{ route('sorteos.orders.resend', $order->hashed_id) }}">
+                <i class="fa fa-envelope"></i> {{ trans('Sorteos::attributes.order.resend_email') }}
+            </button>
+        @endif
+    </div>
+
     @component('components.box')
         @slot('box_title')
             {{ trans('Sorteos::module.order.title_singular') }}
             @if($order->status)
                 <span class="badge {{ $order->status->badgeClass() }}">{{ $order->status->label() }}</span>
-            @endif
-        @endslot
-        @slot('box_tools')
-            @if($order->isPending())
-                <button class="btn btn-sm btn-success" data-toggle="modal" data-target="#payModal">
-                    <i class="fa fa-credit-card"></i> Registrar Pago
-                </button>
-                <button class="btn btn-sm btn-danger" data-toggle="modal" data-target="#cancelModal">
-                    <i class="fa fa-times"></i> Cancelar Orden
-                </button>
-            @endif
-            @if($order->isConfirmed())
-                <button class="btn btn-sm btn-info"
-                        data-action="post"
-                        data-request-data='{"_token":"{{ csrf_token() }}"}'
-                        data-href="{{ route('sorteos.orders.resend', $order->hashed_id) }}">
-                    <i class="fa fa-envelope"></i> {{ trans('Sorteos::attributes.order.resend_email') }}
-                </button>
             @endif
         @endslot
 
