@@ -27,6 +27,7 @@ class OrdersDataTable extends BaseDataTable
     {
         return [
             'id'             => ['visible' => false],
+            'hashed_id'      => ['title' => '#Orden', 'orderable' => false, 'searchable' => false],
             'buyer_name'     => ['title' => trans('Sorteos::attributes.order.buyer_name')],
             'buyer_email'    => ['title' => trans('Sorteos::attributes.order.buyer_email')],
             'buyer_phone'    => ['title' => trans('Sorteos::attributes.order.buyer_phone')],
