@@ -26,12 +26,10 @@ class OrderTransformer extends BaseTransformer
             ? '<span class="badge ' . $order->status->badgeClass() . '">' . $order->status->label() . '</span>'
             : '-';
 
-        $buyerOrdersUrl = url(config('sorteos.models.order.resource_url')) . '?buyer_email=' . urlencode($order->buyer_email);
-
         $transformedArray = [
             'id'             => $order->id,
             'hashed_id'      => HtmlElement('a', ['href' => $order->getShowURL()], '#' . $order->hashed_id),
-            'buyer_name'     => HtmlElement('a', ['href' => $buyerOrdersUrl], $order->buyer_name),
+            'buyer_name'     => $order->buyer_name,
             'buyer_email'    => $order->buyer_email,
             'buyer_phone'    => $order->buyer_phone,
             'sorteo'         => $order->sorteo?->name ?? '-',
