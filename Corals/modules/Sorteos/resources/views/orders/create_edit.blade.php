@@ -13,14 +13,13 @@
 
 @section('content')
     @parent
-    <div class="row">
+    @component('components.box')
+        <div class="row">
 
-        {{-- Columna izquierda: campos del formulario --}}
-        <div class="{{ $order->exists ? 'col-md-8' : 'col-md-12' }}">
-            @component('components.box')
+            {{-- Columna izquierda: campos del formulario --}}
+            <div class="{{ $order->exists ? 'col-md-8' : 'col-md-12' }}">
                 {!! CoralsForm::openForm($order) !!}
 
-                {{-- Sorteo y Colaborador --}}
                 <div class="row">
                     <div class="col-md-6">
                         {!! CoralsForm::select('sorteo_id', 'Sorteos::attributes.order.sorteo_id', $sorteos, true, $order->sorteo_id, ['id' => 'sorteo_id']) !!}
@@ -30,7 +29,6 @@
                     </div>
                 </div>
 
-                {{-- Datos del comprador --}}
                 <div class="row">
                     <div class="col-md-4">
                         {!! CoralsForm::text('buyer_name', 'Sorteos::attributes.order.buyer_name', true, $order->buyer_name) !!}
@@ -53,7 +51,6 @@
                 </div>
 
                 @if($order->exists)
-                    {{-- Boletos: solo lectura --}}
                     <div class="row">
                         <div class="col-md-12">
                             <label>Boletos</label>
@@ -77,7 +74,6 @@
                         </div>
                     </div>
                 @else
-                    {{-- Selección dinámica cuando hay colaborador --}}
                     <div id="boleto-dynamic" style="display:none">
                         <div class="row">
                             <div class="col-md-6">
@@ -105,7 +101,6 @@
                         </div>
                     </div>
 
-                    {{-- Selección manual sin colaborador --}}
                     <div id="boleto-manual">
                         <div class="row">
                             <div class="col-md-6">
@@ -193,106 +188,105 @@
 
                 {!! CoralsForm::customFields($order) !!}
 
-                <div class="row">
-                    <div class="col-md-12">
-                        {!! CoralsForm::formButtons() !!}
-                    </div>
-                </div>
+                {!! CoralsForm::formButtons() !!}
 
                 {!! CoralsForm::closeForm($order) !!}
-            @endcomponent
-        </div>
-
-        {{-- Columna derecha: Pago + acciones (solo al editar) --}}
-        @if($order->exists)
-        <div class="col-md-4">
-            <div class="card">
-                <div class="card-header">
-                    <strong>Estado</strong>
-                    @if($order->status)
-                        <span class="badge {{ $order->status->badgeClass() }} float-right" style="font-size:.9em; margin-top:2px">
-                            {{ $order->status->label() }}
-                        </span>
-                    @endif
-                </div>
-                <div class="card-body">
-
-                    {{-- Sección Pago: campos asociados al formulario principal vía atributo form= --}}
-                    <h6 class="text-muted text-uppercase mb-3"><i class="fa fa-credit-card"></i> Pago</h6>
-
-                    <div class="form-group">
-                        <label>{{ trans('Sorteos::attributes.order.payment_method') }}</label>
-                        <select name="payment_method" form="order-edit-form" class="form-control">
-                            @foreach($paymentMethods as $value => $label)
-                                <option value="{{ $value }}" {{ $order->payment_method?->value === $value ? 'selected' : '' }}>
-                                    {{ $label }}
-                                </option>
-                            @endforeach
-                        </select>
-                    </div>
-
-                    <div class="form-group">
-                        <label>{{ trans('Sorteos::attributes.order.payment_reference') }}</label>
-                        <input type="text" name="payment_reference" form="order-edit-form"
-                               class="form-control" placeholder="Folio, No. transferencia, etc."
-                               value="{{ $order->payment_reference }}">
-                    </div>
-
-                    <hr>
-
-                    {{-- Botón Guardar (submit del form principal) --}}
-                    <button type="submit" form="order-edit-form" class="btn btn-primary btn-block mb-3">
-                        <i class="fa fa-save"></i> Guardar
-                    </button>
-
-                    @if($order->isPending())
-                        <button type="button" class="btn btn-success btn-block mb-2"
-                                onclick="orderAction('{{ route('sorteos.orders.confirm', $order->hashed_id) }}', '¿Confirmar el pago de esta orden?')">
-                            <i class="fa fa-check"></i> Confirmar Pago
-                        </button>
-                        <button type="button" class="btn btn-danger btn-block"
-                                onclick="orderAction('{{ route('sorteos.orders.cancel', $order->hashed_id) }}', '¿Cancelar esta orden? Los boletos quedarán disponibles nuevamente.')">
-                            <i class="fa fa-times"></i> Cancelar Orden
-                        </button>
-                    @endif
-
-                    @if($order->isConfirmed())
-                        <button class="btn btn-info btn-block"
-                                data-action="post"
-                                data-request-data='{"_token":"{{ csrf_token() }}"}'
-                                data-href="{{ route('sorteos.orders.resend', $order->hashed_id) }}">
-                            <i class="fa fa-envelope"></i> Reenviar Email
-                        </button>
-                    @endif
-
-                </div>
             </div>
-        </div>
 
-        <script>
-        // Give the main form a known ID so we can reference it from the right column
-        document.addEventListener('DOMContentLoaded', function () {
-            var forms = document.querySelectorAll('form');
-            for (var i = 0; i < forms.length; i++) {
-                if (forms[i].action.indexOf('/orders/') !== -1) {
-                    forms[i].id = 'order-edit-form';
-                    break;
+            {{-- Columna derecha: Estado, Pago y Acciones (solo al editar) --}}
+            @if($order->exists)
+            <div class="col-md-4">
+
+                {{-- Panel de estado --}}
+                @php
+                    $statusBoxClass = match($order->status?->value) {
+                        'confirmed' => 'box-success',
+                        'cancelled' => 'box-danger',
+                        default     => 'box-warning',
+                    };
+                @endphp
+                <div class="box {{ $statusBoxClass }} collapsed-box" style="border-top-width:3px">
+                    <div class="box-header">
+                        <h3 class="box-title" style="font-size:1.1em; font-weight:600">
+                            <i class="fa fa-circle"></i>
+                            &nbsp;{{ $order->status?->label() ?? 'Sin estado' }}
+                        </h3>
+                    </div>
+                </div>
+
+                {{-- Panel de Pago --}}
+                <div class="box box-default">
+                    <div class="box-header with-border">
+                        <h3 class="box-title"><i class="fa fa-credit-card"></i> Pago</h3>
+                    </div>
+                    <div class="box-body">
+                        <div class="form-group">
+                            <label>{{ trans('Sorteos::attributes.order.payment_method') }}</label>
+                            <select name="payment_method" form="order-edit-form" class="form-control">
+                                @foreach($paymentMethods as $value => $label)
+                                    <option value="{{ $value }}" {{ $order->payment_method?->value === $value ? 'selected' : '' }}>
+                                        {{ $label }}
+                                    </option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>{{ trans('Sorteos::attributes.order.payment_reference') }}</label>
+                            <input type="text" name="payment_reference" form="order-edit-form"
+                                   class="form-control" placeholder="Folio, No. transferencia, etc."
+                                   value="{{ $order->payment_reference }}">
+                        </div>
+
+                        <button type="submit" form="order-edit-form" class="btn btn-primary btn-block mb-3">
+                            <i class="fa fa-save"></i> Guardar
+                        </button>
+
+                        @if($order->isPending())
+                            <button type="button" class="btn btn-success btn-block mb-2"
+                                    onclick="orderAction('{{ route('sorteos.orders.confirm', $order->hashed_id) }}', '¿Confirmar el pago de esta orden?')">
+                                <i class="fa fa-check"></i> Confirmar Pago
+                            </button>
+                            <button type="button" class="btn btn-danger btn-block"
+                                    onclick="orderAction('{{ route('sorteos.orders.cancel', $order->hashed_id) }}', '¿Cancelar esta orden? Los boletos quedarán disponibles nuevamente.')">
+                                <i class="fa fa-times"></i> Cancelar Orden
+                            </button>
+                        @endif
+
+                        @if($order->isConfirmed())
+                            <button class="btn btn-info btn-block"
+                                    data-action="post"
+                                    data-request-data='{"_token":"{{ csrf_token() }}"}'
+                                    data-href="{{ route('sorteos.orders.resend', $order->hashed_id) }}">
+                                <i class="fa fa-envelope"></i> Reenviar Email
+                            </button>
+                        @endif
+                    </div>
+                </div>
+
+            </div>
+
+            <script>
+            document.addEventListener('DOMContentLoaded', function () {
+                var forms = document.querySelectorAll('form');
+                for (var i = 0; i < forms.length; i++) {
+                    if (forms[i].action.indexOf('/orders/') !== -1) {
+                        forms[i].id = 'order-edit-form';
+                        break;
+                    }
                 }
+            });
+
+            function orderAction(url, msg) {
+                if (!confirm(msg)) { return; }
+                var form = document.getElementById('order-edit-form');
+                var m = form.querySelector('input[name="_method"]');
+                if (m) { m.parentNode.removeChild(m); }
+                form.action = url;
+                form.submit();
             }
-        });
+            </script>
+            @endif
 
-        // Submit the main form to a different action URL (confirm / cancel)
-        function orderAction(url, msg) {
-            if (!confirm(msg)) { return; }
-            var form = document.getElementById('order-edit-form');
-            // Remove _method spoofing so the request goes as plain POST
-            var m = form.querySelector('input[name="_method"]');
-            if (m) { m.parentNode.removeChild(m); }
-            form.action = url;
-            form.submit();
-        }
-        </script>
-        @endif
-
-    </div>
+        </div>{{-- /.row --}}
+    @endcomponent
 @endsection
