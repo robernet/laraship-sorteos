@@ -24,7 +24,7 @@
                         {!! CoralsForm::select('sorteo_id', 'Sorteos::attributes.order.sorteo_id', $sorteos, true, $order->sorteo_id, ['id' => 'sorteo_id']) !!}
                     </div>
                     <div class="col-md-4">
-                        {!! CoralsForm::select('asignado_id', 'Sorteos::attributes.order.asignado_id', $asignados, false, $order->asignado_id, ['id' => 'asignado_id']) !!}
+                        {!! CoralsForm::select('colaborador_id', 'Sorteos::attributes.order.colaborador_id', $colaboradores, false, $order->colaborador_id, ['id' => 'colaborador_id']) !!}
                     </div>
                     <div class="col-md-4">
                         {!! CoralsForm::select('payment_method', 'Sorteos::attributes.order.payment_method', $paymentMethods, true, $order->payment_method?->value) !!}
@@ -121,7 +121,7 @@
 
                     <script>
                     (function () {
-                        var apiUrl    = '{{ route('sorteos.orders.carteras-by-asignado') }}';
+                        var apiUrl    = '{{ route('sorteos.orders.carteras-by-colaborador') }}';
                         var carteraEl = document.getElementById('cartera-select');
                         var boletoEl  = document.getElementById('boleto-select');
                         var dynamic   = document.getElementById('boleto-dynamic');
@@ -130,16 +130,16 @@
                         var carterasData = {};
 
                         function loadCarteras() {
-                            var asignadoId = document.getElementById('asignado_id').value;
-                            var sorteoId   = document.getElementById('sorteo_id').value;
+                            var colaboradorId = document.getElementById('colaborador_id').value;
+                            var sorteoId      = document.getElementById('sorteo_id').value;
 
-                            if (!asignadoId || !sorteoId) {
+                            if (!colaboradorId || !sorteoId) {
                                 dynamic.style.display = 'none';
                                 manual.style.display  = '';
                                 return;
                             }
 
-                            fetch(apiUrl + '?asignado_id=' + asignadoId + '&sorteo_id=' + sorteoId, {
+                            fetch(apiUrl + '?colaborador_id=' + colaboradorId + '&sorteo_id=' + sorteoId, {
                                 headers: { 'X-Requested-With': 'XMLHttpRequest' }
                             })
                             .then(function(r) { return r.json(); })
@@ -184,7 +184,7 @@
                             });
                         });
 
-                        document.getElementById('asignado_id').addEventListener('change', loadCarteras);
+                        document.getElementById('colaborador_id').addEventListener('change', loadCarteras);
                         document.getElementById('sorteo_id').addEventListener('change', loadCarteras);
                     })();
                     </script>

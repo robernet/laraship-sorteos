@@ -38,14 +38,14 @@ class CarterasController extends BaseController
     {
         $cartera       = new Cartera();
         $sorteos       = Sorteo::pluck('name', 'id');
-        $asignados     = \Corals\Modules\Sorteos\Models\Asignado::where('status', 'active')->pluck('name', 'id')->prepend('— Sin asignar —', '')->all();
+        $colaboradores = \Corals\Modules\Sorteos\Models\Colaborador::where('status', 'active')->pluck('name', 'id')->prepend('— Sin asignar —', '')->all();
         $statusOptions = collect(\Corals\Modules\Sorteos\Enums\CarteraStatus::cases())->mapWithKeys(fn($c) => [$c->value => $c->label()])->all();
 
         $this->setViewSharedData([
             'title_singular' => trans('Corals::labels.create_title', ['title' => $this->title_singular]),
         ]);
 
-        return view('Sorteos::carteras.create_edit')->with(compact('cartera', 'sorteos', 'asignados', 'statusOptions'));
+        return view('Sorteos::carteras.create_edit')->with(compact('cartera', 'sorteos', 'colaboradores', 'statusOptions'));
     }
 
     public function store(CarteraRequest $request)
@@ -76,14 +76,14 @@ class CarterasController extends BaseController
     public function edit(CarteraRequest $request, Cartera $cartera)
     {
         $sorteos       = Sorteo::pluck('name', 'id');
-        $asignados     = \Corals\Modules\Sorteos\Models\Asignado::where('status', 'active')->pluck('name', 'id')->prepend('— Sin asignar —', '')->all();
+        $colaboradores = \Corals\Modules\Sorteos\Models\Colaborador::where('status', 'active')->pluck('name', 'id')->prepend('— Sin asignar —', '')->all();
         $statusOptions = collect(\Corals\Modules\Sorteos\Enums\CarteraStatus::cases())->mapWithKeys(fn($c) => [$c->value => $c->label()])->all();
 
         $this->setViewSharedData([
             'title_singular' => trans('Corals::labels.update_title', ['title' => $cartera->getIdentifier()]),
         ]);
 
-        return view('Sorteos::carteras.create_edit')->with(compact('cartera', 'sorteos', 'asignados', 'statusOptions'));
+        return view('Sorteos::carteras.create_edit')->with(compact('cartera', 'sorteos', 'colaboradores', 'statusOptions'));
     }
 
     public function update(CarteraRequest $request, Cartera $cartera)
@@ -91,7 +91,7 @@ class CarterasController extends BaseController
         if ($this->isLocked($cartera)) {
             $request->merge(array_intersect_key(
                 $request->all(),
-                array_flip(['asignado_id', 'status', '_token', '_method'])
+                array_flip(['colaborador_id', 'status', '_token', '_method'])
             ));
         }
 

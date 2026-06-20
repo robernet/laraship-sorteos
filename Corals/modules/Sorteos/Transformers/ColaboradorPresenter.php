@@ -4,10 +4,10 @@ namespace Corals\Modules\Sorteos\Transformers;
 
 use Corals\Foundation\Transformers\FractalPresenter;
 
-class AsignadoPresenter extends FractalPresenter
+class ColaboradorPresenter extends FractalPresenter
 {
     public function getTransformer($extras = [])
     {
-        return new AsignadoTransformer($extras);
+        return new ColaboradorTransformer($extras);
     }
 }

@@ -2,7 +2,7 @@
 
 namespace Corals\Modules\Sorteos\Enums;
 
-enum AsignadoStatus: string
+enum ColaboradorStatus: string
 {
     case Active   = 'active';
     case Inactive = 'inactive';

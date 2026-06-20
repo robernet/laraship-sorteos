@@ -6,7 +6,7 @@
             {{ $title }}
         @endslot
         @slot('breadcrumb')
-            {{ Breadcrumbs::render('sorteos_asignados') }}
+            {{ Breadcrumbs::render('sorteos_colaboradores') }}
         @endslot
     @endcomponent
 @endsection

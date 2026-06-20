@@ -3,22 +3,22 @@
 namespace Corals\Modules\Sorteos\DataTables;
 
 use Corals\Foundation\DataTables\BaseDataTable;
-use Corals\Modules\Sorteos\Models\Asignado;
-use Corals\Modules\Sorteos\Transformers\AsignadoTransformer;
+use Corals\Modules\Sorteos\Models\Colaborador;
+use Corals\Modules\Sorteos\Transformers\ColaboradorTransformer;
 use Yajra\DataTables\EloquentDataTable;
 
-class AsignadosDataTable extends BaseDataTable
+class ColaboradoresDataTable extends BaseDataTable
 {
     public function dataTable($query)
     {
-        $this->setResourceUrl(config('sorteos.models.asignado.resource_url'));
+        $this->setResourceUrl(config('sorteos.models.colaborador.resource_url'));
 
         $dataTable = new EloquentDataTable($query);
 
-        return $dataTable->setTransformer(new AsignadoTransformer());
+        return $dataTable->setTransformer(new ColaboradorTransformer());
     }
 
-    public function query(Asignado $model)
+    public function query(Colaborador $model)
     {
         return $model->newQuery()->withCount('carteras');
     }
@@ -27,12 +27,12 @@ class AsignadosDataTable extends BaseDataTable
     {
         return [
             'id'             => ['visible' => false],
-            'name'           => ['title' => trans('Sorteos::attributes.asignado.name')],
-            'email'          => ['title' => trans('Sorteos::attributes.asignado.email')],
-            'phone'          => ['title' => trans('Sorteos::attributes.asignado.phone')],
-            'type'           => ['title' => trans('Sorteos::attributes.asignado.type')],
-            'status'         => ['title' => trans('Sorteos::attributes.asignado.status')],
-            'carteras_count' => ['title' => trans('Sorteos::attributes.asignado.carteras_count'), 'orderable' => false, 'searchable' => false],
+            'name'           => ['title' => trans('Sorteos::attributes.colaborador.name')],
+            'email'          => ['title' => trans('Sorteos::attributes.colaborador.email')],
+            'phone'          => ['title' => trans('Sorteos::attributes.colaborador.phone')],
+            'type'           => ['title' => trans('Sorteos::attributes.colaborador.type')],
+            'status'         => ['title' => trans('Sorteos::attributes.colaborador.status')],
+            'carteras_count' => ['title' => trans('Sorteos::attributes.colaborador.carteras_count'), 'orderable' => false, 'searchable' => false],
             'created_at'     => ['title' => trans('Corals::attributes.created_at')],
         ];
     }
@@ -41,17 +41,17 @@ class AsignadosDataTable extends BaseDataTable
     {
         return [
             'name'   => [
-                'title'     => trans('Sorteos::attributes.asignado.name'),
+                'title'     => trans('Sorteos::attributes.colaborador.name'),
                 'class'     => 'col-md-4',
                 'type'      => 'text',
                 'condition' => 'like',
                 'active'    => true,
             ],
             'status' => [
-                'title'   => trans('Sorteos::attributes.asignado.status'),
+                'title'   => trans('Sorteos::attributes.colaborador.status'),
                 'class'   => 'col-md-3',
                 'type'    => 'select',
-                'options' => collect(\Corals\Modules\Sorteos\Enums\AsignadoStatus::cases())
+                'options' => collect(\Corals\Modules\Sorteos\Enums\ColaboradorStatus::cases())
                     ->mapWithKeys(fn($c) => [$c->value => $c->label()])
                     ->all(),
                 'active'  => true,
@@ -64,7 +64,7 @@ class AsignadosDataTable extends BaseDataTable
         return [
             'delete' => [
                 'title'        => trans('Corals::labels.delete'),
-                'permission'   => 'Sorteos::asignado.delete',
+                'permission'   => 'Sorteos::colaborador.delete',
                 'confirmation' => trans('Corals::labels.confirmation.title'),
             ],
         ];
@@ -72,6 +72,6 @@ class AsignadosDataTable extends BaseDataTable
 
     protected function getOptions()
     {
-        return ['resource_url' => url(config('sorteos.models.asignado.resource_url'))];
+        return ['resource_url' => url(config('sorteos.models.colaborador.resource_url'))];
     }
 }

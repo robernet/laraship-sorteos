@@ -23,7 +23,7 @@ Route::group(['prefix' => 'sorteos'], function () {
     Route::post('carteras/import', 'CarterasController@importCsv')->name('sorteos.carteras.import');
     Route::resource('carteras', 'CarterasController')->parameters(['carteras' => 'cartera']);
 
-    Route::get('orders/carteras-by-asignado', 'OrdersController@carterasByAsignado')->name('sorteos.orders.carteras-by-asignado');
+    Route::get('orders/carteras-by-colaborador', 'OrdersController@carterasByColaborador')->name('sorteos.orders.carteras-by-colaborador');
     Route::post('orders/{order}/confirm', 'OrdersController@confirmOrder')->name('sorteos.orders.confirm');
     Route::post('orders/{order}/cancel', 'OrdersController@cancelOrder')->name('sorteos.orders.cancel');
     Route::post('orders/{order}/pay', 'PaymentsController@initiate')->name('sorteos.orders.pay');
@@ -33,8 +33,8 @@ Route::group(['prefix' => 'sorteos'], function () {
     Route::post('orders/{order}/resend', 'OrdersController@resendTickets')->name('sorteos.orders.resend');
     Route::resource('orders', 'OrdersController')->parameters(['orders' => 'order']);
 
-    Route::post('asignados/{asignado}/assign-carteras', 'AsignadosController@assignCarteras')->name('sorteos.asignados.assign-carteras');
-    Route::resource('asignados', 'AsignadosController')->parameters(['asignados' => 'asignado']);
+    Route::post('colaboradores/{colaborador}/assign-carteras', 'ColaboradoresController@assignCarteras')->name('sorteos.colaboradores.assign-carteras');
+    Route::resource('colaboradores', 'ColaboradoresController')->parameters(['colaboradores' => 'colaborador']);
 
     Route::get('audit', 'AuditController@index')->name('sorteos.audit.index');
 

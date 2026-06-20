@@ -4,7 +4,7 @@ namespace Corals\Modules\Sorteos\Http\Requests;
 
 use Corals\Foundation\Http\Requests\BaseRequest;
 
-class AsignadoRequest extends BaseRequest
+class ColaboradorRequest extends BaseRequest
 {
     public function authorize(): bool
     {

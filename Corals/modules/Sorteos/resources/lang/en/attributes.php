@@ -16,7 +16,7 @@ return [
     ],
     'cartera' => [
         'sorteo_id'      => 'Sorteo',
-        'asignado_id'    => 'Asignado',
+        'colaborador_id' => 'Colaborador',
         'code'           => 'Código de Cartera',
         'physical_start' => 'Número Físico Inicial',
         'physical_end'   => 'Número Físico Final',
@@ -25,7 +25,7 @@ return [
         'status'         => 'Estado',
         'boletos_count'  => 'Boletos',
     ],
-    'asignado' => [
+    'colaborador' => [
         'name'           => 'Nombre',
         'email'          => 'Correo Electrónico',
         'phone'          => 'Teléfono',
@@ -43,7 +43,7 @@ return [
     ],
     'order'   => [
         'sorteo_id'          => 'Sorteo',
-        'asignado_id'        => 'Colaborador',
+        'colaborador_id'     => 'Colaborador',
         'buyer_name'         => 'Nombre del Comprador',
         'buyer_email'        => 'Correo Electrónico',
         'buyer_phone'        => 'Teléfono',

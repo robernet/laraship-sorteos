@@ -25,8 +25,8 @@
                         <td>{{ $cartera->sorteo?->name ?? '-' }}</td>
                     </tr>
                     <tr>
-                        <th>{{ trans('Sorteos::attributes.cartera.asignado_id') }}</th>
-                        <td>{{ $cartera->asignado?->name ?? '-' }}</td>
+                        <th>{{ trans('Sorteos::attributes.cartera.colaborador_id') }}</th>
+                        <td>{{ $cartera->colaborador?->name ?? '-' }}</td>
                     </tr>
                     <tr>
                         <th>{{ trans('Sorteos::attributes.cartera.status') }}</th>

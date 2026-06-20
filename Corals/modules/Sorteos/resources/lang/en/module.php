@@ -17,8 +17,8 @@ return [
         'title'          => 'Órdenes',
         'title_singular' => 'Orden',
     ],
-    'asignado' => [
-        'title'          => 'Asignados',
-        'title_singular' => 'Asignado',
+    'colaborador' => [
+        'title'          => 'Colaboradores',
+        'title_singular' => 'Colaborador',
     ],
 ];

@@ -67,8 +67,8 @@ class OrderService extends BaseServiceClass
 
         // If a collaborator is set, scope all boleto resolution to their carteras only
         $asignadoCarteraIds = null;
-        if ($request->filled('asignado_id')) {
-            $asignadoCarteraIds = \Corals\Modules\Sorteos\Models\Cartera::where('asignado_id', $request->input('asignado_id'))
+        if ($request->filled('colaborador_id')) {
+            $asignadoCarteraIds = \Corals\Modules\Sorteos\Models\Cartera::where('colaborador_id', $request->input('colaborador_id'))
                 ->where('sorteo_id', $sorteoId)
                 ->pluck('id')
                 ->toArray();

@@ -6,7 +6,7 @@
             {{ $title_singular }}
         @endslot
         @slot('breadcrumb')
-            {{ Breadcrumbs::render('sorteos_asignado_show') }}
+            {{ Breadcrumbs::render('sorteos_colaborador_show') }}
         @endslot
     @endcomponent
 @endsection
@@ -17,41 +17,41 @@
             <div class="col-md-6">
                 <table class="table table-striped">
                     <tr>
-                        <th>{{ trans('Sorteos::attributes.asignado.name') }}</th>
-                        <td>{{ $asignado->name }}</td>
+                        <th>{{ trans('Sorteos::attributes.colaborador.name') }}</th>
+                        <td>{{ $colaborador->name }}</td>
                     </tr>
                     <tr>
-                        <th>{{ trans('Sorteos::attributes.asignado.email') }}</th>
-                        <td>{{ $asignado->email ?? '-' }}</td>
+                        <th>{{ trans('Sorteos::attributes.colaborador.email') }}</th>
+                        <td>{{ $colaborador->email ?? '-' }}</td>
                     </tr>
                     <tr>
-                        <th>{{ trans('Sorteos::attributes.asignado.phone') }}</th>
-                        <td>{{ $asignado->phone ?? '-' }}</td>
+                        <th>{{ trans('Sorteos::attributes.colaborador.phone') }}</th>
+                        <td>{{ $colaborador->phone ?? '-' }}</td>
                     </tr>
                     <tr>
-                        <th>{{ trans('Sorteos::attributes.asignado.type') }}</th>
-                        <td>{{ $asignado->type === 'institucion' ? 'Institución' : 'Persona' }}</td>
+                        <th>{{ trans('Sorteos::attributes.colaborador.type') }}</th>
+                        <td>{{ $colaborador->type === 'institucion' ? 'Institución' : 'Persona' }}</td>
                     </tr>
                     <tr>
-                        <th>{{ trans('Sorteos::attributes.asignado.status') }}</th>
+                        <th>{{ trans('Sorteos::attributes.colaborador.status') }}</th>
                         <td>
-                            @if($asignado->status)
-                                <span class="badge {{ $asignado->status->badgeClass() }}">{{ $asignado->status->label() }}</span>
+                            @if($colaborador->status)
+                                <span class="badge {{ $colaborador->status->badgeClass() }}">{{ $colaborador->status->label() }}</span>
                             @endif
                         </td>
                     </tr>
                     <tr>
-                        <th>{{ trans('Sorteos::attributes.asignado.notes') }}</th>
-                        <td>{{ $asignado->notes ?? '-' }}</td>
+                        <th>{{ trans('Sorteos::attributes.colaborador.notes') }}</th>
+                        <td>{{ $colaborador->notes ?? '-' }}</td>
                     </tr>
                 </table>
             </div>
             <div class="col-md-6">
                 @php
-                    $total     = $asignado->carteras->count();
-                    $asignadas = $asignado->carteras->filter(fn($c) => $c->status?->value === 'asignado')->count();
-                    $entregadas = $asignado->carteras->filter(fn($c) => $c->status?->value === 'entregado')->count();
-                    $vendidas  = $asignado->carteras->filter(fn($c) => $c->status?->value === 'sold')->count();
+                    $total     = $colaborador->carteras->count();
+                    $asignadas = $colaborador->carteras->filter(fn($c) => $c->status?->value === 'asignado')->count();
+                    $entregadas = $colaborador->carteras->filter(fn($c) => $c->status?->value === 'entregado')->count();
+                    $vendidas  = $colaborador->carteras->filter(fn($c) => $c->status?->value === 'sold')->count();
                 @endphp
                 <table class="table table-bordered text-center">
                     <thead class="bg-light">
@@ -77,7 +77,7 @@
 
     @component('components.box')
         @slot('box_title')
-            {{ trans('Sorteos::module.cartera.title') }} ({{ $asignado->carteras->count() }})
+            {{ trans('Sorteos::module.cartera.title') }} ({{ $colaborador->carteras->count() }})
         @endslot
         @slot('box_actions')
             @if($assignableCarteras->isNotEmpty())
@@ -87,7 +87,7 @@
             @endif
         @endslot
 
-        @if($asignado->carteras->isNotEmpty())
+        @if($colaborador->carteras->isNotEmpty())
         <div class="row" style="margin-bottom:12px">
             <div class="col-md-5">
                 <input type="text" id="searchCode" class="form-control input-sm" placeholder="Buscar por código...">
@@ -121,7 +121,7 @@
                 </tr>
             </thead>
             <tbody>
-                @foreach($asignado->carteras->sortBy('code') as $cartera)
+                @foreach($colaborador->carteras->sortBy('code') as $cartera)
                 <tr data-id="{{ $cartera->hashed_id }}" data-code="{{ strtolower($cartera->code) }}" data-status="{{ $cartera->status?->value }}">
                     <td><strong>{{ $cartera->code }}</strong></td>
                     <td>{{ $cartera->sorteo?->name ?? '-' }}</td>
@@ -182,11 +182,11 @@
     <div class="modal fade" id="assignModal" tabindex="-1" role="dialog">
         <div class="modal-dialog modal-lg" role="document">
             <div class="modal-content">
-                <form method="POST" action="{{ route('sorteos.asignados.assign-carteras', $asignado->hashed_id) }}">
+                <form method="POST" action="{{ route('sorteos.colaboradores.assign-carteras', $colaborador->hashed_id) }}">
                     @csrf
                     <div class="modal-header">
                         <button type="button" class="close" data-dismiss="modal">&times;</button>
-                        <h4 class="modal-title">Asignar Carteras a {{ $asignado->name }}</h4>
+                        <h4 class="modal-title">Asignar Carteras a {{ $colaborador->name }}</h4>
                     </div>
                     <div class="modal-body">
                         <div class="form-group">

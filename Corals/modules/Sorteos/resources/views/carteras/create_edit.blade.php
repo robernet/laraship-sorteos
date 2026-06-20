@@ -29,7 +29,7 @@
 
                 <div class="row">
                     <div class="col-md-6">
-                        {!! CoralsForm::select('asignado_id', 'Sorteos::attributes.cartera.asignado_id', $asignados, false, $cartera->asignado_id) !!}
+                        {!! CoralsForm::select('colaborador_id', 'Sorteos::attributes.cartera.colaborador_id', $colaboradores, false, $cartera->colaborador_id) !!}
                     </div>
                     <div class="col-md-6">
                         {!! CoralsForm::select('status', 'Sorteos::attributes.cartera.status', $statusOptions, false, $cartera->status?->value) !!}

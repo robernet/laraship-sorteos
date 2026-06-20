@@ -55,9 +55,9 @@ class SorteosMenuDatabaseSeeder extends Seeder
                 'order'           => 2,
             ],
             [
-                'url'             => config('sorteos.models.asignado.resource_url'),
-                'active_menu_url' => config('sorteos.models.asignado.resource_url') . '*',
-                'name'            => 'Asignados',
+                'url'             => config('sorteos.models.colaborador.resource_url'),
+                'active_menu_url' => config('sorteos.models.colaborador.resource_url') . '*',
+                'name'            => 'Colaboradores',
                 'description'     => 'Personas e instituciones a quienes se asignan carteras',
                 'icon'            => 'fa fa-users',
                 'roles'           => $operatorRoles,

@@ -59,19 +59,19 @@ Breadcrumbs::register('sorteos_order_show', function ($breadcrumbs) {
     $breadcrumbs->push(view()->shared('title_singular'));
 });
 
-//Asignado
-Breadcrumbs::register('sorteos_asignados', function ($breadcrumbs) {
+//Colaborador
+Breadcrumbs::register('sorteos_colaboradores', function ($breadcrumbs) {
     $breadcrumbs->parent('dashboard');
-    $breadcrumbs->push(trans('Sorteos::module.asignado.title'), url(config('sorteos.models.asignado.resource_url')));
+    $breadcrumbs->push(trans('Sorteos::module.colaborador.title'), url(config('sorteos.models.colaborador.resource_url')));
 });
 
-Breadcrumbs::register('sorteos_asignado_create_edit', function ($breadcrumbs) {
-    $breadcrumbs->parent('sorteos_asignados');
+Breadcrumbs::register('sorteos_colaborador_create_edit', function ($breadcrumbs) {
+    $breadcrumbs->parent('sorteos_colaboradores');
     $breadcrumbs->push(view()->shared('title_singular'));
 });
 
-Breadcrumbs::register('sorteos_asignado_show', function ($breadcrumbs) {
-    $breadcrumbs->parent('sorteos_asignados');
+Breadcrumbs::register('sorteos_colaborador_show', function ($breadcrumbs) {
+    $breadcrumbs->parent('sorteos_colaboradores');
     $breadcrumbs->push(view()->shared('title_singular'));
 });
 
