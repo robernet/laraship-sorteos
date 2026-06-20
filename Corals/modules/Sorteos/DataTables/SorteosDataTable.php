@@ -73,16 +73,9 @@ class SorteosDataTable extends BaseDataTable
                 'title'   => trans('Sorteos::attributes.sorteo.status'),
                 'class'   => 'col-md-3',
                 'type'    => 'select',
-                'options' => collect(\Corals\Modules\Sorteos\Enums\SorteoStatus::cases())
+                'options' => ['' => '— Todos —'] + collect(\Corals\Modules\Sorteos\Enums\SorteoStatus::cases())
                     ->mapWithKeys(fn($case) => [$case->value => $case->label()])
                     ->all(),
-                'active'  => true,
-            ],
-            'is_public' => [
-                'title'   => trans('Sorteos::attributes.sorteo.is_public'),
-                'class'   => 'col-md-3',
-                'type'    => 'select',
-                'options' => [1 => trans('Corals::labels.yes'), 0 => trans('Corals::labels.no')],
                 'active'  => true,
             ],
         ];

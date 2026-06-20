@@ -50,7 +50,7 @@ class BoletosDataTable extends BaseDataTable
                 'title'   => trans('Sorteos::attributes.boleto.status'),
                 'class'   => 'col-md-3',
                 'type'    => 'select',
-                'options' => collect(\Corals\Modules\Sorteos\Enums\BoletoStatus::cases())
+                'options' => ['' => '— Todos —'] + collect(\Corals\Modules\Sorteos\Enums\BoletoStatus::cases())
                     ->mapWithKeys(fn($case) => [$case->value => $case->label()])
                     ->all(),
                 'active'  => true,
