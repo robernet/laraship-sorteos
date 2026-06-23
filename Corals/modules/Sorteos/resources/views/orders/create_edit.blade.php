@@ -206,12 +206,14 @@
                     };
                 @endphp
                 <div class="box {{ $statusBoxClass }} collapsed-box" style="border-top-width:3px">
-                    <div class="box-header">
-                        <h3 class="box-title" style="font-size:1.1em; font-weight:600">
-                            <i class="fa fa-circle"></i>
-                            &nbsp;{{ $order->status?->label() ?? 'Sin estado' }}
-                        </h3>
+                    <div class="box-header with-border">
+                        <h3 class="box-title"><i class="fa fa-check-square-o"></i> Status</h3>
+                        &nbsp;<i class="fa fa-circle"></i>
+                        &nbsp;{{ $order->status?->label() ?? 'Sin estado' }}
                     </div>
+                    <div class="box-body">
+                    </div>
+
                 </div>
 
                 {{-- Panel de Pago --}}

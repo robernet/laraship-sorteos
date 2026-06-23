@@ -39,6 +39,7 @@ class SorteoRequest extends BaseRequest
                 'prize_description' => ['nullable', 'string'],
                 'cover_image'       => ['nullable', 'string'],
                 'ticket_price'      => ['required', 'numeric', 'min:0'],
+                'tiraje'            => ['nullable', 'integer', 'min:1'],
                 'starts_at'         => ['nullable', 'date'],
                 'ends_at'           => ['nullable', 'date', 'after_or_equal:starts_at'],
                 'draw_date'         => ['nullable', 'date', 'after_or_equal:ends_at'],

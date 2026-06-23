@@ -36,6 +36,7 @@ class SorteoTransformer extends BaseTransformer
             'slug'         => $sorteo->slug,
             'status'       => $statusBadge,
             'ticket_price' => '$' . number_format((float) $sorteo->ticket_price, 2),
+            'tiraje'       => $sorteo->tiraje ? number_format($sorteo->tiraje) : '-',
             'is_public'    => $isPublicIcon,
             'starts_at'    => format_date($sorteo->starts_at),
             'ends_at'      => format_date($sorteo->ends_at),

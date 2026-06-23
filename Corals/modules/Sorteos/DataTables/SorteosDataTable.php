@@ -47,6 +47,7 @@ class SorteosDataTable extends BaseDataTable
             'slug'         => ['title' => trans('Sorteos::attributes.sorteo.slug')],
             'status'       => ['title' => trans('Sorteos::attributes.sorteo.status')],
             'ticket_price' => ['title' => trans('Sorteos::attributes.sorteo.ticket_price')],
+            'tiraje'       => ['title' => trans('Sorteos::attributes.sorteo.tiraje')],
             'is_public'    => [
                 'title'      => trans('Sorteos::attributes.sorteo.is_public'),
                 'orderable'  => false,

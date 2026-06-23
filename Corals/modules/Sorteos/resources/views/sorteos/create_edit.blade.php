@@ -47,10 +47,13 @@
                     </div>
                 </div>
 
-                {{-- Precio, estado, imagen, visibilidad --}}
+                {{-- Precio, tiraje, estado, imagen, visibilidad --}}
                 <div class="row">
                     <div class="col-md-3">
                         {!! CoralsForm::number('ticket_price', 'Sorteos::attributes.sorteo.ticket_price', true, $sorteo->ticket_price) !!}
+                    </div>
+                    <div class="col-md-3">
+                        {!! CoralsForm::number('tiraje', 'Sorteos::attributes.sorteo.tiraje', false, $sorteo->tiraje) !!}
                     </div>
                     <div class="col-md-3">
                         {!! CoralsForm::select('status', 'Sorteos::attributes.sorteo.status', $statusOptions, true, $sorteo->status?->value) !!}
@@ -58,6 +61,8 @@
                     <div class="col-md-3">
                         {!! CoralsForm::text('cover_image', 'Sorteos::attributes.sorteo.cover_image', false, $sorteo->cover_image) !!}
                     </div>
+                </div>
+                <div class="row">
                     <div class="col-md-3">
                         {!! CoralsForm::checkbox('is_public', 'Sorteos::attributes.sorteo.is_public', $sorteo->is_public) !!}
                     </div>

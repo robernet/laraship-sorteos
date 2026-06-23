@@ -8,6 +8,7 @@ return [
         'prize_description' => 'Descripción del Premio',
         'cover_image'       => 'Imagen de Portada',
         'ticket_price'      => 'Precio por Boleto',
+        'tiraje'            => 'Tiraje Total de Boletos',
         'starts_at'         => 'Fecha de Inicio',
         'ends_at'           => 'Fecha de Cierre',
         'draw_date'         => 'Fecha del Sorteo',

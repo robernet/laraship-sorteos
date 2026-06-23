@@ -25,6 +25,7 @@ class Sorteo extends BaseModel
     protected $casts = [
         'properties'   => 'json',
         'ticket_price' => 'decimal:2',
+        'tiraje'       => 'integer',
         'starts_at'    => 'date',
         'ends_at'      => 'date',
         'draw_date'    => 'date',
