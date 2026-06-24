@@ -75,6 +75,12 @@ Breadcrumbs::register('sorteos_colaborador_show', function ($breadcrumbs) {
     $breadcrumbs->push(view()->shared('title_singular'));
 });
 
+//Dashboard
+Breadcrumbs::register('sorteos_dashboard', function ($breadcrumbs) {
+    $breadcrumbs->parent('dashboard');
+    $breadcrumbs->push('Dashboard', url('sorteos/dashboard'));
+});
+
 //Audit
 Breadcrumbs::register('sorteos_audit', function ($breadcrumbs) {
     $breadcrumbs->parent('dashboard');

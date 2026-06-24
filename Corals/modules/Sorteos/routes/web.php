@@ -36,6 +36,8 @@ Route::group(['prefix' => 'sorteos'], function () {
     Route::post('colaboradores/{colaborador}/assign-carteras', 'ColaboradoresController@assignCarteras')->name('sorteos.colaboradores.assign-carteras');
     Route::resource('colaboradores', 'ColaboradoresController')->parameters(['colaboradores' => 'colaborador']);
 
+    Route::get('dashboard', 'DashboardController@index')->name('sorteos.dashboard');
+
     Route::get('audit', 'AuditController@index')->name('sorteos.audit.index');
 
     Route::get('reports',                'ReportsController@index')->name('sorteos.reports.index');
