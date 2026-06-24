@@ -66,11 +66,15 @@ class DashboardController extends BaseController
         $drawDate = $sorteo->draw_date ? Carbon::parse($sorteo->draw_date) : null;
         $daysLeft = $drawDate ? (int) now()->diffInDays($drawDate, false) : null;
 
-        // Ventas diarias (últimos 30 días)
-        $from = now()->subDays(29)->startOfDay();
+        // Ventas diarias desde la fecha de inicio del sorteo
+        $from = $sorteo->starts_at
+            ? Carbon::parse($sorteo->starts_at)->startOfDay()
+            : now()->subDays(29)->startOfDay();
+        $to   = now()->endOfDay();
+
         $dailySales = Order::where('sorteo_id', $sid)
             ->where('status', 'confirmed')
-            ->where('created_at', '>=', $from)
+            ->whereBetween('created_at', [$from, $to])
             ->selectRaw('DATE(created_at) as day, count(*) as orders, sum(total_amount) as revenue')
             ->groupBy('day')
             ->orderBy('day')
@@ -78,11 +82,13 @@ class DashboardController extends BaseController
             ->keyBy('day');
 
         $dailyLabels = $dailyOrders = $dailyRevenue = [];
-        for ($i = 29; $i >= 0; $i--) {
-            $day            = now()->subDays($i)->format('Y-m-d');
-            $dailyLabels[]  = now()->subDays($i)->format('d/m');
+        $current = $from->copy();
+        while ($current->lte($to)) {
+            $day            = $current->format('Y-m-d');
+            $dailyLabels[]  = $current->format('d/m');
             $dailyOrders[]  = $dailySales->has($day) ? (int) $dailySales[$day]->orders  : 0;
             $dailyRevenue[] = $dailySales->has($day) ? (float) $dailySales[$day]->revenue : 0;
+            $current->addDay();
         }
 
         // Distribución geográfica

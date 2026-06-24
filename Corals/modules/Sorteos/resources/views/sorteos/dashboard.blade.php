@@ -2,24 +2,35 @@
 
 @section('css')
     <style>
-        .kpi-box { border-radius: 6px; padding: 18px 20px; color: #fff; margin-bottom: 16px; position: relative; overflow: hidden; }
-        .kpi-box .kpi-value { font-size: 2rem; font-weight: 700; line-height: 1; }
-        .kpi-box .kpi-label { font-size: 0.82rem; opacity: .85; margin-top: 4px; }
-        .kpi-box .kpi-icon  { font-size: 2.4rem; opacity: .3; position: absolute; right: 18px; top: 14px; }
+        .kpi-box { border-radius: 6px; padding: 20px 22px; color: #fff; margin-bottom: 16px; position: relative; overflow: hidden; }
+        .kpi-box .kpi-value { font-size: 32px; font-weight: 700; line-height: 1; }
+        .kpi-box .kpi-label { font-size: 15px; opacity: .95; margin-top: 6px; }
+        .kpi-box .kpi-icon  { font-size: 44px; opacity: .3; position: absolute; right: 18px; top: 14px; }
         .kpi-green  { background: #00a65a; }
         .kpi-blue   { background: #0073b7; }
         .kpi-purple { background: #605ca8; }
         .kpi-orange { background: #f39c12; }
         .kpi-red    { background: #dd4b39; }
         .kpi-teal   { background: #00acd6; }
-        .chart-box  { background: #fff; border: 1px solid #e0e0e0; border-radius: 6px; padding: 16px; margin-bottom: 20px; }
-        .chart-box h4 { font-size: 0.95rem; font-weight: 600; color: #444; margin-bottom: 14px; border-bottom: 1px solid #f0f0f0; padding-bottom: 8px; }
-        .stat-mini { text-align: center; padding: 10px 0; }
-        .stat-mini .n { font-size: 1.6rem; font-weight: 700; }
-        .stat-mini .l { font-size: 0.75rem; color: #888; }
-        .colabs-table th { font-size: 0.82rem; color: #777; font-weight: 600; }
-        .colabs-table td { font-size: 0.9rem; }
-        .progress-bar-label { font-size: 0.78rem; margin-bottom: 2px; }
+        .chart-box  { background: #fff; border: 1px solid #e0e0e0; border-radius: 6px; padding: 18px; margin-bottom: 20px; }
+        .chart-box h4 { font-size: 16px; font-weight: 600; color: #333; margin-bottom: 14px; border-bottom: 1px solid #f0f0f0; padding-bottom: 8px; }
+        .stat-mini { text-align: center; padding: 12px 0; }
+        .stat-mini .n { font-size: 28px; font-weight: 700; }
+        .stat-mini .l { font-size: 14px; color: #555; margin-top: 2px; }
+        .colabs-table th { font-size: 14px; color: #444; font-weight: 600; }
+        .colabs-table td { font-size: 15px; }
+        .progress-bar-label { font-size: 15px; margin-bottom: 5px; }
+        .progress { height: 24px !important; border-radius: 4px; }
+        .progress-bar { font-size: 14px; line-height: 24px; }
+        .dash-wrap { padding-left: 10px; padding-right: 10px; }
+        .alerta-card { display: flex; align-items: flex-start; gap: 12px; padding: 12px 16px; border-radius: 6px; margin-bottom: 8px; }
+        .alerta-card:last-child { margin-bottom: 0; }
+        .alerta-card .alerta-icon { font-size: 20px; flex-shrink: 0; margin-top: 1px; }
+        .alerta-card .alerta-msg  { font-size: 14px; line-height: 1.4; }
+        .alerta-danger  { background: #fdf2f2; border-left: 4px solid #dd4b39; color: #8b1a1a; }
+        .alerta-warning { background: #fdf8ec; border-left: 4px solid #f39c12; color: #7a5800; }
+        .alerta-info    { background: #eef6fb; border-left: 4px solid #0073b7; color: #004a75; }
+        .alerta-success { background: #edfaf3; border-left: 4px solid #00a65a; color: #005c32; }
     </style>
 @endsection
 
@@ -31,31 +42,31 @@
 @endsection
 
 @section('content')
-    {{-- Selector de sorteo --}}
-    <form method="GET" class="mb-4">
-        <div class="row align-items-center">
-            <div class="col-md-4">
-                <select name="sorteo_id" class="form-control" onchange="this.form.submit()">
-                    @foreach($sorteos as $id => $name)
-                        <option value="{{ $id }}" @selected($sorteoId == $id || (!$sorteoId && $loop->first))>{{ $name }}</option>
-                    @endforeach
-                </select>
-            </div>
-            @if($sorteo)
-            <div class="col-md-8 d-flex align-items-center flex-wrap gap-2">
-                <span class="badge badge-{{ $sorteo->status?->badgeClass() ?? 'secondary' }} mr-2" style="font-size:.85rem;padding:5px 10px;">
-                    {{ $sorteo->status?->label() }}
-                </span>
-                @if($sorteo->draw_date)
-                    <span class="text-muted" style="font-size:.85rem;">
-                        <i class="fa fa-calendar mr-1"></i>Fecha del sorteo: <strong>{{ $sorteo->draw_date->format('d/m/Y') }}</strong>
+    <div class="dash-wrap">
+        {{-- Selector de sorteo --}}
+        <form method="GET" class="mb-4">
+            <div class="row align-items-center">
+                <div class="col-md-4">
+                    <select name="sorteo_id" class="form-control" onchange="this.form.submit()">
+                        @foreach($sorteos as $id => $name)
+                            <option value="{{ $id }}" @selected($sorteoId == $id || (!$sorteoId && $loop->first))>{{ $name }}</option>
+                        @endforeach
+                    </select>
+                </div>
+                @if($sorteo)
+                <div class="col-md-8 d-flex align-items-center flex-wrap gap-2">
+                    <span class="badge badge-{{ $sorteo->status?->badgeClass() ?? 'secondary' }} mr-2" style="font-size:16px;padding:5px 10px;">
+                        {{ $sorteo->status?->label() }}
                     </span>
+                    @if($sorteo->draw_date)
+                        <span class="text-muted" style="font-size:16px;">
+                            <i class="fa fa-calendar mr-1"></i>&nbsp;&nbsp;Fecha del sorteo: <strong>{{ $sorteo->draw_date->format('d/m/Y') }}</strong>
+                        </span>
+                    @endif
+                </div>
                 @endif
             </div>
-            @endif
-        </div>
-    </form>
-
+        </form>
     @if(!$sorteo)
         <div class="alert alert-info">No hay sorteos registrados.</div>
     @else
@@ -83,11 +94,17 @@
     @endphp
 
     {{-- Alertas --}}
-    @foreach($alertas as $alerta)
-    <div class="alert alert-{{ $alerta['type'] }} py-2 mb-2">
-        <i class="fa {{ $alerta['icon'] }} mr-2"></i> {{ $alerta['msg'] }}
+    @if(count($alertas))
+    <div class="chart-box mb-3">
+        <h4><i class="fa fa-bell mr-1"></i> Alertas</h4>
+        @foreach($alertas as $alerta)
+        <div class="alerta-card alerta-{{ $alerta['type'] }}">
+            <i class="fa {{ $alerta['icon'] }} alerta-icon"></i>
+            <span class="alerta-msg">{{ $alerta['msg'] }}</span>
+        </div>
+        @endforeach
     </div>
-    @endforeach
+    @endif
 
     {{-- KPI Cards --}}
     <div class="row">
@@ -288,6 +305,7 @@
     </div>
 
     @endif
+    </div>{{-- /dash-wrap --}}
 @endsection
 
 @section('js')
@@ -295,7 +313,7 @@
 @if($sorteo && count($data))
 <script>
 Chart.defaults.global.defaultFontFamily = "'Source Sans Pro', sans-serif";
-Chart.defaults.global.defaultFontSize   = 12;
+Chart.defaults.global.defaultFontSize   = 14;
 
 // Doughnut: Boletos
 new Chart(document.getElementById('chartBoletos').getContext('2d'), {
