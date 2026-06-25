@@ -150,8 +150,14 @@
                                 data.carteras.forEach(function(c) {
                                     carterasData[c.id] = c.boletos;
                                     var opt = document.createElement('option');
-                                    opt.value       = c.id;
-                                    opt.textContent = c.code + ' (' + c.boletos.length + ' disponibles)';
+                                    opt.value = c.id;
+                                    var label = c.code;
+                                    if (c.boletos.length > 0) {
+                                        var nums = c.boletos.map(function(b) { return b.number; });
+                                        label += ' [Boletos: ' + Math.min.apply(null, nums) + '-' + Math.max.apply(null, nums) + ']';
+                                    }
+                                    label += ' (' + c.boletos.length + ' disponibles)';
+                                    opt.textContent = label;
                                     carteraEl.appendChild(opt);
                                 });
                                 dynamic.style.display = '';
@@ -178,6 +184,14 @@
                         document.getElementById('sorteo_id').addEventListener('change', loadCarteras);
                     })();
                     </script>
+                @endif
+
+                @if(!$order->exists)
+                <div class="row">
+                    <div class="col-md-6">
+                        {!! CoralsForm::select('payment_method', 'Sorteos::attributes.order.payment_method', $paymentMethods, true, null) !!}
+                    </div>
+                </div>
                 @endif
 
                 <div class="row">
