@@ -82,7 +82,7 @@
     </div>
 @endsection
 
-@push('js')
+@section('js')
 <script src="{{ asset('assets/corals/plugins/chartjs/Chart.min.js') }}"></script>
 <script>
 new Chart(document.getElementById('methodChart'), {
@@ -94,4 +94,4 @@ new Chart(document.getElementById('methodChart'), {
     options: { responsive: true, legend: { position: 'bottom' } }
 });
 </script>
-@endpush
+@endsection
