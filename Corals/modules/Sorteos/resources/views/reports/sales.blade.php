@@ -87,15 +87,15 @@
         <div class="box-body table-responsive">
             <table class="table table-striped table-hover">
                 <thead>
-                    <tr><th>Período</th><th>Órdenes</th><th>Ingresos</th><th>Boletos</th></tr>
+                    <tr><th>Período</th><th>Órdenes</th><th>Boletos</th><th><strong>Ingresos</strong></th></tr>
                 </thead>
                 <tbody>
                     @foreach($data['labels'] as $i => $label)
                     <tr>
                         <td>{{ $label }}</td>
                         <td>{{ $data['orders'][$i] }}</td>
-                        <td>${{ number_format($data['revenue'][$i], 2) }}</td>
                         <td>{{ $data['tickets'][$i] }}</td>
+                        <td><strong>${{ number_format($data['revenue'][$i], 2) }}</strong></td>
                     </tr>
                     @endforeach
                 </tbody>
@@ -103,8 +103,8 @@
                     <tr class="active">
                         <th>Total</th>
                         <th>{{ $data['totals']['orders'] }}</th>
-                        <th>${{ number_format($data['totals']['revenue'], 2) }}</th>
                         <th>{{ $data['totals']['tickets'] }}</th>
+                        <th><strong>${{ number_format($data['totals']['revenue'], 2) }}</strong></th>
                     </tr>
                 </tfoot>
             </table>
