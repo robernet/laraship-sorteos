@@ -99,6 +99,14 @@
                     </tr>
                     @endforeach
                 </tbody>
+                <tfoot>
+                    <tr class="active">
+                        <th>Total</th>
+                        <th>{{ $data['totals']['orders'] }}</th>
+                        <th>${{ number_format($data['totals']['revenue'], 2) }}</th>
+                        <th>{{ $data['totals']['tickets'] }}</th>
+                    </tr>
+                </tfoot>
             </table>
         </div>
     </div>
@@ -107,7 +115,7 @@
     @endif
 @endsection
 
-@push('js')
+@section('js')
 <script src="{{ asset('assets/corals/plugins/chartjs/Chart.min.js') }}"></script>
 <script>
 new Chart(document.getElementById('salesChart'), {
@@ -135,10 +143,12 @@ new Chart(document.getElementById('salesChart'), {
     options: {
         responsive: true,
         scales: {
-            y:  { type: 'linear', position: 'left',  title: { display: true, text: 'Ingresos (MXN)' } },
-            y1: { type: 'linear', position: 'right', title: { display: true, text: 'Órdenes' }, grid: { drawOnChartArea: false } }
+            yAxes: [
+                { id: 'y',  type: 'linear', position: 'left',  scaleLabel: { display: true, labelString: 'Ingresos (MXN)' } },
+                { id: 'y1', type: 'linear', position: 'right', scaleLabel: { display: true, labelString: 'Órdenes' }, gridLines: { drawOnChartArea: false } }
+            ]
         }
     }
 });
 </script>
-@endpush
+@endsection
