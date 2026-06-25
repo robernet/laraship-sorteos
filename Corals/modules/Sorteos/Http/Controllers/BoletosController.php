@@ -40,6 +40,8 @@ class BoletosController extends BaseController
             'showModel'      => $boleto,
         ]);
 
+        $boleto->load(['orderItems.order', 'cartera', 'sorteo']);
+
         return view('Sorteos::boletos.show')->with(compact('boleto'));
     }
 

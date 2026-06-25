@@ -40,6 +40,22 @@
                             @endif
                         </td>
                     </tr>
+                    @php $order = $boleto->orderItems->first()?->order; @endphp
+                    <tr>
+                        <th>Comprador</th>
+                        <td>
+                            @if($order)
+                                {{ $order->buyer_name }}<br>
+                                <small class="text-muted">{{ $order->buyer_email }}</small><br>
+                                <small class="text-muted">{{ $order->buyer_phone }}</small>
+                                <a href="{{ url('sorteos/orders/' . $order->hashed_id) }}" class="btn btn-xs btn-default ml-2">
+                                    <i class="fa fa-external-link"></i> Ver orden
+                                </a>
+                            @else
+                                <span class="text-muted">—</span>
+                            @endif
+                        </td>
+                    </tr>
                 </table>
             </div>
         </div>
