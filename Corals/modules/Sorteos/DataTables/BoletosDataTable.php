@@ -31,8 +31,8 @@ class BoletosDataTable extends BaseDataTable
             'physical_number' => ['title' => trans('Sorteos::attributes.boleto.physical_number')],
             'cartera'         => ['title' => trans('Sorteos::attributes.boleto.cartera_id'), 'orderable' => false, 'searchable' => false],
             'sorteo'          => ['title' => trans('Sorteos::attributes.boleto.sorteo_id'), 'orderable' => false, 'searchable' => false],
-            'status'          => ['title' => trans('Sorteos::attributes.boleto.status')],
             'buyer'           => ['title' => 'Comprador', 'orderable' => false, 'searchable' => false],
+            'status'          => ['title' => trans('Sorteos::attributes.boleto.status')],
             'created_at'      => ['title' => trans('Corals::attributes.created_at')],
         ];
     }
