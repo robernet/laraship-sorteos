@@ -22,7 +22,7 @@ class ReportService
             ->selectRaw("DATE_FORMAT(o.created_at, ?) as period_label", [$format])
             ->selectRaw('COUNT(o.id) as orders_count')
             ->selectRaw('SUM(o.total_amount) as revenue')
-            ->selectRaw('(SELECT COUNT(*) FROM sorteos_order_items oi WHERE oi.order_id = o.id) as tickets_sold')
+            ->selectRaw('SUM((SELECT COUNT(*) FROM sorteos_order_items oi WHERE oi.order_id = o.id)) as tickets_sold')
             ->where('o.status', 'confirmed')
             ->whereNull('o.deleted_at')
             ->whereBetween('o.created_at', [$from->startOfDay(), $to->endOfDay()]);
@@ -105,16 +105,24 @@ class ReportService
      */
     public function paymentMethodBreakdown(?int $sorteoId = null): \Illuminate\Support\Collection
     {
-        $query = DB::table('sorteos_orders')
-            ->selectRaw('payment_method, COUNT(*) as count, SUM(total_amount) as revenue')
-            ->where('status', 'confirmed')
-            ->whereNull('deleted_at');
+        $itemCounts = DB::table('sorteos_order_items')
+            ->selectRaw('order_id, COUNT(*) as boleto_count')
+            ->groupBy('order_id');
+
+        $query = DB::table('sorteos_orders as o')
+            ->leftJoinSub($itemCounts, 'ic', 'ic.order_id', '=', 'o.id')
+            ->selectRaw('o.payment_method')
+            ->selectRaw('COUNT(DISTINCT o.id) as count')
+            ->selectRaw('SUM(o.total_amount) as revenue')
+            ->selectRaw('SUM(COALESCE(ic.boleto_count, 0)) as boletos_vendidos')
+            ->where('o.status', 'confirmed')
+            ->whereNull('o.deleted_at');
 
         if ($sorteoId) {
-            $query->where('sorteo_id', $sorteoId);
+            $query->where('o.sorteo_id', $sorteoId);
         }
 
-        return $query->groupBy('payment_method')->orderByDesc('revenue')->get();
+        return $query->groupBy('o.payment_method')->orderByDesc('revenue')->get();
     }
 
     /**
@@ -122,16 +130,22 @@ class ReportService
      */
     public function geographicBreakdown(?int $sorteoId = null): \Illuminate\Support\Collection
     {
-        $query = DB::table('sorteos_orders')
-            ->selectRaw('COALESCE(NULLIF(buyer_state,""), "Sin especificar") as state')
-            ->selectRaw('COALESCE(NULLIF(buyer_city,""), "Sin especificar") as city')
-            ->selectRaw('COUNT(*) as orders_count')
-            ->selectRaw('SUM(total_amount) as revenue')
-            ->where('status', 'confirmed')
-            ->whereNull('deleted_at');
+        $itemCounts = DB::table('sorteos_order_items')
+            ->selectRaw('order_id, COUNT(*) as boleto_count')
+            ->groupBy('order_id');
+
+        $query = DB::table('sorteos_orders as o')
+            ->leftJoinSub($itemCounts, 'ic', 'ic.order_id', '=', 'o.id')
+            ->selectRaw('COALESCE(NULLIF(o.buyer_state,""), "Sin especificar") as state')
+            ->selectRaw('COALESCE(NULLIF(o.buyer_city,""), "Sin especificar") as city')
+            ->selectRaw('COUNT(DISTINCT o.id) as orders_count')
+            ->selectRaw('SUM(o.total_amount) as revenue')
+            ->selectRaw('SUM(COALESCE(ic.boleto_count, 0)) as boletos_vendidos')
+            ->where('o.status', 'confirmed')
+            ->whereNull('o.deleted_at');
 
         if ($sorteoId) {
-            $query->where('sorteo_id', $sorteoId);
+            $query->where('o.sorteo_id', $sorteoId);
         }
 
         return $query->groupBy('state', 'city')

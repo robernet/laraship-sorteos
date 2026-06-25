@@ -47,13 +47,14 @@
                 <div class="box-body table-responsive">
                     <table class="table table-striped">
                         <thead>
-                            <tr><th>Método</th><th class="text-center">Órdenes</th><th class="text-right">Ingresos</th><th class="text-right">% del Total</th></tr>
+                            <tr><th>Método</th><th class="text-center">Órdenes</th><th class="text-center">Boletos</th><th class="text-right">Ingresos</th><th class="text-right">% del Total</th></tr>
                         </thead>
                         <tbody>
                             @forelse($data as $row)
                             <tr>
                                 <td>{{ \Corals\Modules\Sorteos\Enums\PaymentMethod::tryFrom($row->payment_method)?->label() ?? $row->payment_method }}</td>
                                 <td class="text-center">{{ $row->count }}</td>
+                                <td class="text-center">{{ (int) $row->boletos_vendidos }}</td>
                                 <td class="text-right">${{ number_format($row->revenue, 2) }}</td>
                                 <td class="text-right">
                                     {{ $total > 0 ? number_format($row->revenue / $total * 100, 1) : 0 }}%
@@ -68,6 +69,7 @@
                             <tr class="active">
                                 <th>Total</th>
                                 <th class="text-center">{{ $data->sum('count') }}</th>
+                                <th class="text-center">{{ (int) $data->sum('boletos_vendidos') }}</th>
                                 <th class="text-right">${{ number_format($total, 2) }}</th>
                                 <th class="text-right">100%</th>
                             </tr>

@@ -44,8 +44,9 @@
                         <tr>
                             <th>Estado / Región</th>
                             <th>Ciudad</th>
-                            <th>Órdenes</th>
-                            <th>Ingresos</th>
+                            <th class="text-center">Órdenes</th>
+                            <th class="text-center">Boletos</th>
+                            <th class="text-right">Ingresos</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -53,8 +54,9 @@
                         <tr>
                             <td>{{ $row->state }}</td>
                             <td>{{ $row->city }}</td>
-                            <td>{{ $row->orders_count }}</td>
-                            <td>${{ number_format($row->revenue, 2) }}</td>
+                            <td class="text-center">{{ $row->orders_count }}</td>
+                            <td class="text-center">{{ (int) $row->boletos_vendidos }}</td>
+                            <td class="text-right">${{ number_format($row->revenue, 2) }}</td>
                         </tr>
                         @endforeach
                     </tbody>

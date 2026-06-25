@@ -112,9 +112,9 @@ class ReportsController extends BaseController
         }
 
         if ($export === 'xlsx') {
-            $rows = $data->map(fn($r) => [$r->payment_method, (int) $r->count, (float) $r->revenue])->toArray();
+            $rows = $data->map(fn($r) => [$r->payment_method, (int) $r->count, (int) $r->boletos_vendidos, (float) $r->revenue])->toArray();
             return $this->buildXlsx(
-                ['Método de Pago', 'Órdenes', 'Ingresos (MXN)'],
+                ['Método de Pago', 'Órdenes', 'Boletos Vendidos', 'Ingresos (MXN)'],
                 $rows,
                 'reporte-pagos-' . now()->format('Ymd') . '.xlsx'
             );
@@ -138,9 +138,9 @@ class ReportsController extends BaseController
         }
 
         if ($export === 'xlsx') {
-            $rows = $data->map(fn($r) => [$r->state, $r->city, (int) $r->orders_count, (float) $r->revenue])->toArray();
+            $rows = $data->map(fn($r) => [$r->state, $r->city, (int) $r->orders_count, (int) $r->boletos_vendidos, (float) $r->revenue])->toArray();
             return $this->buildXlsx(
-                ['Estado / Región', 'Ciudad', 'Órdenes', 'Ingresos (MXN)'],
+                ['Estado / Región', 'Ciudad', 'Órdenes', 'Boletos Vendidos', 'Ingresos (MXN)'],
                 $rows,
                 'reporte-geografico-' . now()->format('Ymd') . '.xlsx'
             );
@@ -212,9 +212,9 @@ class ReportsController extends BaseController
     {
         return response()->streamDownload(function () use ($data) {
             $csv = Writer::createFromFileObject(new \SplTempFileObject());
-            $csv->insertOne(['Método de Pago', 'Órdenes', 'Ingresos (MXN)']);
+            $csv->insertOne(['Método de Pago', 'Órdenes', 'Boletos Vendidos', 'Ingresos (MXN)']);
             foreach ($data as $row) {
-                $csv->insertOne([$row->payment_method, $row->count, number_format($row->revenue, 2, '.', '')]);
+                $csv->insertOne([$row->payment_method, $row->count, (int) $row->boletos_vendidos, number_format($row->revenue, 2, '.', '')]);
             }
             echo $csv->toString();
         }, 'reporte-pagos-' . now()->format('Ymd') . '.csv', ['Content-Type' => 'text/csv']);
@@ -224,9 +224,9 @@ class ReportsController extends BaseController
     {
         return response()->streamDownload(function () use ($data) {
             $csv = Writer::createFromFileObject(new \SplTempFileObject());
-            $csv->insertOne(['Estado / Región', 'Ciudad', 'Órdenes', 'Ingresos (MXN)']);
+            $csv->insertOne(['Estado / Región', 'Ciudad', 'Órdenes', 'Boletos Vendidos', 'Ingresos (MXN)']);
             foreach ($data as $row) {
-                $csv->insertOne([$row->state, $row->city, $row->orders_count, number_format($row->revenue, 2, '.', '')]);
+                $csv->insertOne([$row->state, $row->city, $row->orders_count, (int) $row->boletos_vendidos, number_format($row->revenue, 2, '.', '')]);
             }
             echo $csv->toString();
         }, 'reporte-geografico-' . now()->format('Ymd') . '.csv', ['Content-Type' => 'text/csv']);
