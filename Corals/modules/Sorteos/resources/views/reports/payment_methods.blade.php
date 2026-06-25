@@ -91,7 +91,7 @@ new Chart(document.getElementById('methodChart'), {
         labels: {!! json_encode($data->map(fn($r) => \Corals\Modules\Sorteos\Enums\PaymentMethod::tryFrom($r->payment_method)?->label() ?? $r->payment_method)->values()) !!},
         datasets: [{ data: {!! json_encode($data->pluck('revenue')->values()) !!}, backgroundColor: ['#1a3a6e','#27ae60','#e67e22','#e74c3c'] }]
     },
-    options: { responsive: true, plugins: { legend: { position: 'bottom' } } }
+    options: { responsive: true, legend: { position: 'bottom' } }
 });
 </script>
 @endpush
