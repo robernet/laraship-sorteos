@@ -36,6 +36,17 @@
     @if($data->isEmpty())
         <div class="alert alert-info">No hay datos geográficos registrados aún.</div>
     @else
+    @php
+        $byState = $data->groupBy('state')->map(fn($rows) => $rows->sum('orders_count'));
+    @endphp
+    <div class="row">
+        <div class="col-md-5">
+            <div class="box box-default">
+                <div class="box-header"><h3 class="box-title">Distribución por Estado</h3></div>
+                <div class="box-body"><canvas id="geoChart" height="200"></canvas></div>
+            </div>
+        </div>
+        <div class="col-md-7">
         <div class="box box-default">
             <div class="box-header"><h3 class="box-title">Compras por Estado y Ciudad</h3></div>
             <div class="box-body table-responsive">
@@ -63,5 +74,21 @@
                 </table>
             </div>
         </div>
+        </div>{{-- /col-md-7 --}}
+    </div>{{-- /row --}}
     @endif
+@endsection
+
+@section('js')
+<script src="{{ asset('assets/corals/plugins/chartjs/Chart.min.js') }}"></script>
+<script>
+new Chart(document.getElementById('geoChart'), {
+    type: 'doughnut',
+    data: {
+        labels: {!! json_encode($byState->keys()->values()) !!},
+        datasets: [{ data: {!! json_encode($byState->values()) !!}, backgroundColor: ['#1a3a6e','#27ae60','#e67e22','#e74c3c','#9b59b6','#2980b9','#16a085','#d35400','#c0392b','#8e44ad'] }]
+    },
+    options: { responsive: true, legend: { position: 'bottom' } }
+});
+</script>
 @endsection

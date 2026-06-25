@@ -46,7 +46,10 @@
                         {!! CoralsForm::text('buyer_city', 'Sorteos::attributes.order.buyer_city', false, $order->buyer_city) !!}
                     </div>
                     <div class="col-md-6">
-                        {!! CoralsForm::text('buyer_state', 'Sorteos::attributes.order.buyer_state', false, $order->buyer_state) !!}
+                        @php
+                        $mexicoStates = [''=>'— Sin especificar —','Aguascalientes'=>'Aguascalientes','Baja California'=>'Baja California','Baja California Sur'=>'Baja California Sur','Campeche'=>'Campeche','Chiapas'=>'Chiapas','Chihuahua'=>'Chihuahua','Ciudad de México'=>'Ciudad de México','Coahuila'=>'Coahuila','Colima'=>'Colima','Durango'=>'Durango','Estado de México'=>'Estado de México','Guanajuato'=>'Guanajuato','Guerrero'=>'Guerrero','Hidalgo'=>'Hidalgo','Jalisco'=>'Jalisco','Michoacán'=>'Michoacán','Morelos'=>'Morelos','Nayarit'=>'Nayarit','Nuevo León'=>'Nuevo León','Oaxaca'=>'Oaxaca','Puebla'=>'Puebla','Querétaro'=>'Querétaro','Quintana Roo'=>'Quintana Roo','San Luis Potosí'=>'San Luis Potosí','Sinaloa'=>'Sinaloa','Sonora'=>'Sonora','Tabasco'=>'Tabasco','Tamaulipas'=>'Tamaulipas','Tlaxcala'=>'Tlaxcala','Veracruz'=>'Veracruz','Yucatán'=>'Yucatán','Zacatecas'=>'Zacatecas'];
+                        @endphp
+                        {!! CoralsForm::select('buyer_state', 'Sorteos::attributes.order.buyer_state', $mexicoStates, false, $order->buyer_state) !!}
                     </div>
                 </div>
 
