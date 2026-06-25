@@ -20,7 +20,7 @@ class BoletosDataTable extends BaseDataTable
 
     public function query(Boleto $model)
     {
-        return $model->newQuery()->with(['cartera', 'sorteo']);
+        return $model->newQuery()->with(['cartera', 'sorteo', 'orderItems.order']);
     }
 
     protected function getColumns()
@@ -32,6 +32,7 @@ class BoletosDataTable extends BaseDataTable
             'cartera'         => ['title' => trans('Sorteos::attributes.boleto.cartera_id'), 'orderable' => false, 'searchable' => false],
             'sorteo'          => ['title' => trans('Sorteos::attributes.boleto.sorteo_id'), 'orderable' => false, 'searchable' => false],
             'status'          => ['title' => trans('Sorteos::attributes.boleto.status')],
+            'buyer'           => ['title' => 'Comprador', 'orderable' => false, 'searchable' => false],
             'created_at'      => ['title' => trans('Corals::attributes.created_at')],
         ];
     }

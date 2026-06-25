@@ -32,6 +32,11 @@ class BoletoTransformer extends BaseTransformer
             'cartera'         => $boleto->cartera?->code ?? '-',
             'sorteo'          => $boleto->sorteo?->name ?? '-',
             'status'          => $statusBadge,
+            'buyer'           => (function () use ($boleto) {
+                $order = $boleto->orderItems->first()?->order;
+                if (!$order) { return '-'; }
+                return HtmlElement('a', ['href' => url('sorteos/orders/' . $order->hashed_id)], e($order->buyer_name));
+            })(),
             'created_at'      => format_date($boleto->created_at),
             'action'          => $this->actions($boleto),
         ];
