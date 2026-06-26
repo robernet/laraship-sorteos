@@ -261,9 +261,9 @@
                     <thead>
                         <tr>
                             <th colspan="2"></th>
-                            <th colspan="2" class="text-center" style="border-bottom:0;font-size:11px;color:#888;font-weight:400;">Órdenes</th>
-                            <th colspan="3" class="text-center" style="border-bottom:0;font-size:11px;color:#888;font-weight:400;">Boletos</th>
-                            <th colspan="2" class="text-right" style="border-bottom:0;font-size:11px;color:#888;font-weight:400;">Totales</th>
+                            <th colspan="2" class="text-center" style="border-bottom:0;">Órdenes</th>
+                            <th colspan="3" class="text-center" style="border-bottom:0;">Boletos</th>
+                            <th colspan="2" class="text-right" style="border-bottom:0;">Totales</th>
                         </tr>
                         <tr>
                             <th>#</th><th>Colaborador</th>
