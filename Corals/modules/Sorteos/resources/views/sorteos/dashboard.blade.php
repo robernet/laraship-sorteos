@@ -95,7 +95,8 @@
 
     {{-- Alertas --}}
     @if(count($alertas))
-    <div class="chart-box mb-3">
+    <div class="mb-4">&nbsp;</div>
+    <div class="chart-box col-md-6 col-sm-6">
         <h4><i class="fa fa-bell mr-1"></i> Alertas</h4>
         @foreach($alertas as $alerta)
         <div class="alerta-card alerta-{{ $alerta['type'] }}">
@@ -261,6 +262,8 @@
                         <tr>
                             <th>#</th><th>Colaborador</th>
                             <th class="text-center">Órdenes</th>
+                            <th class="text-center">Vendidos</th>
+                            <th class="text-center">Disponibles</th>
                             <th class="text-right">Ingresos</th>
                         </tr>
                     </thead>
@@ -270,6 +273,8 @@
                             <td class="text-muted">{{ $i + 1 }}</td>
                             <td>{{ $c->name }}</td>
                             <td class="text-center">{{ $c->orders }}</td>
+                            <td class="text-center">{{ (int) $c->boletos_vendidos }}</td>
+                            <td class="text-center">{{ (int) $c->boletos_disponibles }}</td>
                             <td class="text-right">${{ number_format($c->revenue, 2) }}</td>
                         </tr>
                         @endforeach

@@ -119,12 +119,19 @@ class DashboardController extends BaseController
         }, array_keys($paymentMethods));
 
         // Top colaboradores
-        $topColaboradores = Order::where('sorteos_orders.sorteo_id', $sid)
-            ->where('sorteos_orders.status', 'confirmed')
-            ->whereNotNull('sorteos_orders.colaborador_id')
-            ->join('sorteos_colaboradores', 'sorteos_orders.colaborador_id', '=', 'sorteos_colaboradores.id')
-            ->selectRaw('sorteos_colaboradores.name, count(*) as orders, sum(sorteos_orders.total_amount) as revenue')
-            ->groupBy('sorteos_colaboradores.name')
+        $topColaboradores = \DB::table('sorteos_colaboradores as col')
+            ->join('sorteos_orders as o', function ($join) use ($sid) {
+                $join->on('o.colaborador_id', '=', 'col.id')
+                     ->where('o.sorteo_id', $sid)
+                     ->where('o.status', 'confirmed')
+                     ->whereNull('o.deleted_at');
+            })
+            ->selectRaw('col.id, col.name')
+            ->selectRaw('COUNT(DISTINCT o.id) as orders')
+            ->selectRaw('SUM(o.total_amount) as revenue')
+            ->selectRaw("(SELECT COUNT(*) FROM sorteos_order_items oi JOIN sorteos_orders o2 ON o2.id = oi.order_id WHERE o2.colaborador_id = col.id AND o2.sorteo_id = {$sid} AND o2.status = 'confirmed' AND o2.deleted_at IS NULL) as boletos_vendidos")
+            ->selectRaw("(SELECT COUNT(*) FROM sorteos_boletos b JOIN sorteos_carteras c ON c.id = b.cartera_id WHERE c.colaborador_id = col.id AND c.sorteo_id = {$sid} AND b.status = 'available') as boletos_disponibles")
+            ->groupBy('col.id', 'col.name')
             ->orderByDesc('revenue')
             ->limit(10)
             ->get();
