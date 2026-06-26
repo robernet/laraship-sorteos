@@ -19,6 +19,7 @@
         .stat-mini .l { font-size: 14px; color: #555; margin-top: 2px; }
         .colabs-table th { font-size: 14px; color: #444; font-weight: 600; }
         .colabs-table td { font-size: 15px; }
+        .colabs-table .col-gray { background-color: #f2f2f2; }
         .progress-bar-label { font-size: 15px; margin-bottom: 5px; }
         .progress { height: 24px !important; border-radius: 4px; }
         .progress-bar { font-size: 14px; line-height: 24px; }
@@ -261,19 +262,19 @@
                     <thead>
                         <tr>
                             <th colspan="2"></th>
-                            <th colspan="2" class="text-center" style="border-bottom:0;">Órdenes</th>
+                            <th colspan="2" class="text-center col-gray" style="border-bottom:0;">Órdenes</th>
                             <th colspan="3" class="text-center" style="border-bottom:0;">Boletos</th>
-                            <th colspan="2" class="text-right" style="border-bottom:0;">Totales</th>
+                            <th colspan="2" class="text-right col-gray" style="border-bottom:0;">Totales</th>
                         </tr>
                         <tr>
                             <th>#</th><th>Colaborador</th>
-                            <th class="text-center">Conf.</th>
-                            <th class="text-center">Pend.</th>
+                            <th class="text-center col-gray">Conf.</th>
+                            <th class="text-center col-gray">Pend.</th>
                             <th class="text-center">Vendidos</th>
                             <th class="text-center">Reservados</th>
                             <th class="text-center">Disponibles</th>
-                            <th class="text-right">Ingresos</th>
-                            <th class="text-right">Por Cobrar</th>
+                            <th class="text-right col-gray">Ingresos</th>
+                            <th class="text-right col-gray">Por Cobrar</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -281,13 +282,13 @@
                         <tr>
                             <td class="text-muted">{{ $i + 1 }}</td>
                             <td>{{ $c->name }}</td>
-                            <td class="text-center">{{ $c->orders }}</td>
-                            <td class="text-center">{{ (int) $c->pendientes }}</td>
+                            <td class="text-center col-gray">{{ $c->orders }}</td>
+                            <td class="text-center col-gray">{{ (int) $c->pendientes }}</td>
                             <td class="text-center">{{ (int) $c->boletos_vendidos }}</td>
                             <td class="text-center">{{ (int) $c->boletos_reservados }}</td>
                             <td class="text-center">{{ (int) $c->boletos_disponibles }}</td>
-                            <td class="text-right">${{ number_format($c->revenue, 2) }}</td>
-                            <td class="text-right text-warning">${{ number_format($c->por_cobrar, 2) }}</td>
+                            <td class="text-right col-gray">${{ number_format($c->revenue, 2) }}</td>
+                            <td class="text-right col-gray text-warning">${{ number_format($c->por_cobrar, 2) }}</td>
                         </tr>
                         @endforeach
                     </tbody>
