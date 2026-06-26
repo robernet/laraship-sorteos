@@ -261,10 +261,13 @@
                     <thead>
                         <tr>
                             <th>#</th><th>Colaborador</th>
-                            <th class="text-center">Órdenes</th>
+                            <th class="text-center">Conf.</th>
+                            <th class="text-center">Pend.</th>
                             <th class="text-center">Vendidos</th>
+                            <th class="text-center">Reservados</th>
                             <th class="text-center">Disponibles</th>
                             <th class="text-right">Ingresos</th>
+                            <th class="text-right">Por Cobrar</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -273,9 +276,12 @@
                             <td class="text-muted">{{ $i + 1 }}</td>
                             <td>{{ $c->name }}</td>
                             <td class="text-center">{{ $c->orders }}</td>
+                            <td class="text-center">{{ (int) $c->pendientes }}</td>
                             <td class="text-center">{{ (int) $c->boletos_vendidos }}</td>
+                            <td class="text-center">{{ (int) $c->boletos_reservados }}</td>
                             <td class="text-center">{{ (int) $c->boletos_disponibles }}</td>
                             <td class="text-right">${{ number_format($c->revenue, 2) }}</td>
+                            <td class="text-right text-warning">${{ number_format($c->por_cobrar, 2) }}</td>
                         </tr>
                         @endforeach
                     </tbody>
