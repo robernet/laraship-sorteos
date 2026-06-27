@@ -264,7 +264,7 @@
                             <th colspan="2"></th>
                             <th colspan="2" class="text-center col-gray" style="border-bottom:0;">Órdenes</th>
                             <th colspan="3" class="text-center" style="border-bottom:0;">Boletos</th>
-                            <th colspan="2" class="text-right col-gray" style="border-bottom:0;">Totales</th>
+                            <th colspan="2" class="text-center col-gray" style="border-bottom:0;">Totales</th>
                         </tr>
                         <tr>
                             <th>#</th><th>Colaborador</th>
