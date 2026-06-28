@@ -36,7 +36,7 @@ class WebhookController extends Controller
             }
         } catch (\Exception $e) {
             log_exception($e, Order::class, 'webhook');
-            return response()->json(['error' => $e->getMessage()], 500);
+            return response()->json(['error' => 'Internal server error'], 500);
         }
 
         return response()->json(['status' => 'ok']);

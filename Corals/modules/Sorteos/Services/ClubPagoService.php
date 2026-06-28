@@ -4,6 +4,7 @@ namespace Corals\Modules\Sorteos\Services;
 
 use Corals\Modules\ClubPago\Models\ClubPagoReference;
 use Corals\Modules\Sorteos\Models\Order;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 
@@ -17,7 +18,12 @@ class ClubPagoService
             && !empty(\Settings::get("{$prefix}_password"));
     }
 
-    public function initiatePayment(Order $order): ClubPagoReference
+    /**
+     * Generate a ClubPago payment reference and return the key payment data.
+     *
+     * @return array{reference: string, payment_url: string, bar_code: string, folio: string, date: string}
+     */
+    public function initiatePayment(Order $order): array
     {
         $token = $this->getToken();
 
@@ -48,7 +54,7 @@ class ClubPagoService
             throw new \RuntimeException('No se pudo generar la referencia de pago con ClubPago.');
         }
 
-        $ref = ClubPagoReference::updateOrCreate(
+        ClubPagoReference::updateOrCreate(
             ['reference' => $data['Reference']],
             [
                 'order_id'      => $order->id,
@@ -67,7 +73,72 @@ class ClubPagoService
 
         $order->update(['payment_reference' => $data['Reference']]);
 
-        return $ref;
+        return [
+            'reference'   => $data['Reference'],
+            'payment_url' => $data['PayFormat'] ?? '',
+            'bar_code'    => $data['BarCode'] ?? '',
+            'folio'       => $data['Folio'] ?? '',
+            'date'        => $data['Date'] ?? '',
+        ];
+    }
+
+    /**
+     * Validate incoming webhook/terminal request authenticity.
+     *
+     * ClubPago terminals identify themselves via X-Origin (base64 of the configured
+     * origin string) and a fixed User-Agent. Both headers must match the settings values.
+     * hash_equals() is used to prevent timing-based header enumeration.
+     */
+    public function validateWebhookSignature(Request $request): bool
+    {
+        $expectedOrigin    = base64_encode((string) \Settings::get('payment_clubpago_x_origin', ''));
+        $expectedUserAgent = (string) \Settings::get('payment_clubpago_user_agent', '');
+
+        if (!$request->hasHeader('X-Origin') || !$request->hasHeader('User-Agent')) {
+            return false;
+        }
+
+        if (!hash_equals($expectedOrigin, (string) $request->header('X-Origin'))) {
+            return false;
+        }
+
+        if (!hash_equals($expectedUserAgent, (string) $request->header('User-Agent'))) {
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * Resolve the Order linked to an incoming webhook payload.
+     *
+     * Expects payload field 'referencia' — the ClubPago reference string.
+     */
+    public function resolveOrderFromWebhook(array $payload): ?Order
+    {
+        $referencia = $payload['referencia'] ?? null;
+        if (!$referencia) {
+            return null;
+        }
+
+        $ref = ClubPagoReference::where('reference', $referencia)->first();
+        return $ref?->order;
+    }
+
+    /**
+     * Return true when the payload signals a successful payment (codigo === 0).
+     */
+    public function isPaymentConfirmed(array $payload): bool
+    {
+        return isset($payload['codigo']) && (int) $payload['codigo'] === 0;
+    }
+
+    /**
+     * Return true when the payload signals a failed or rejected payment (any non-zero codigo).
+     */
+    public function isPaymentRejected(array $payload): bool
+    {
+        return isset($payload['codigo']) && (int) $payload['codigo'] !== 0;
     }
 
     private function getToken(): string

@@ -9,6 +9,7 @@ use Corals\Modules\Sorteos\Models\Boleto;
 use Corals\Modules\Sorteos\Models\Order;
 use Corals\Modules\Sorteos\Jobs\SendOrderConfirmationEmail;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Support\Facades\DB;
 
 class OrderService extends BaseServiceClass
 {
@@ -129,19 +130,25 @@ class OrderService extends BaseServiceClass
 
     public function confirmOrder(Order $order): void
     {
-        if (!$order->isPending()) {
-            throw new \RuntimeException('Solo se pueden confirmar órdenes pendientes.');
-        }
+        DB::transaction(function () use ($order) {
+            // Re-fetch with an exclusive row lock so concurrent webhook retries
+            // cannot both pass the isPending() guard simultaneously.
+            $order = Order::lockForUpdate()->findOrFail($order->id);
 
-        $order->items()->with('boleto')->get()->each(function ($item) {
-            $item->boleto->update(['status' => BoletoStatus::Sold->value]);
+            if (!$order->isPending()) {
+                throw new \RuntimeException('Solo se pueden confirmar órdenes pendientes.');
+            }
+
+            $order->items()->with('boleto')->get()->each(function ($item) {
+                $item->boleto->update(['status' => BoletoStatus::Sold->value]);
+            });
+
+            $order->update(['status' => OrderStatus::Confirmed]);
+
+            $this->recalculateAffectedCarteras($order);
+
+            \Actions::dispatch('order.confirmed', [$order]);
         });
-
-        $order->update(['status' => OrderStatus::Confirmed]);
-
-        $this->recalculateAffectedCarteras($order);
-
-        \Actions::dispatch('order.confirmed', [$order]);
 
         // ponytail: sync keeps email delivery reliable without a queue worker; switch to dispatch() if a worker is configured
         SendOrderConfirmationEmail::dispatchSync($order);
@@ -149,19 +156,23 @@ class OrderService extends BaseServiceClass
 
     public function cancelOrder(Order $order): void
     {
-        if (!$order->isPending()) {
-            throw new \RuntimeException('Solo se pueden cancelar órdenes pendientes.');
-        }
+        DB::transaction(function () use ($order) {
+            $order = Order::lockForUpdate()->findOrFail($order->id);
 
-        $order->items()->with('boleto')->get()->each(function ($item) {
-            $item->boleto->update(['status' => BoletoStatus::Available->value]);
+            if (!$order->isPending()) {
+                throw new \RuntimeException('Solo se pueden cancelar órdenes pendientes.');
+            }
+
+            $order->items()->with('boleto')->get()->each(function ($item) {
+                $item->boleto->update(['status' => BoletoStatus::Available->value]);
+            });
+
+            $order->update(['status' => OrderStatus::Cancelled]);
+
+            $this->recalculateAffectedCarteras($order);
+
+            \Actions::dispatch('order.cancelled', [$order]);
         });
-
-        $order->update(['status' => OrderStatus::Cancelled]);
-
-        $this->recalculateAffectedCarteras($order);
-
-        \Actions::dispatch('order.cancelled', [$order]);
     }
 
     private function recalculateAffectedCarteras(Order $order): void

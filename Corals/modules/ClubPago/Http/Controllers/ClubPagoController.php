@@ -2,7 +2,6 @@
 
 namespace Corals\Modules\ClubPago\Http\Controllers;
 
-use Carbon\Carbon;
 use Corals\Foundation\Http\Controllers\PublicBaseController;
 use Corals\Modules\ClubPago\Models\ClubPagoReference;
 use Corals\Modules\Sorteos\Models\Order;
@@ -22,6 +21,8 @@ class ClubPagoController extends PublicBaseController
             return response()->json(['codigo' => 2, 'message' => 'Origen Desconocido'], 403);
         }
 
+        $request->validate(['r' => 'required|string|max:100']);
+
         $referencia = $request->query('r');
         $ref = ClubPagoReference::where('reference', $referencia)->first();
 
@@ -34,7 +35,7 @@ class ClubPagoController extends PublicBaseController
         }
 
         $monto = number_format($ref->amount * 100, 0, '.', '');
-        return $this->jsonResponse(0, $monto, rand(0, 1000000), 'Transacción Exitosa', $referencia);
+        return $this->jsonResponse(0, $monto, random_int(0, 1000000), 'Transacción Exitosa', $referencia);
     }
 
     public function pagoReferencia(Request $request)
@@ -47,6 +48,12 @@ class ClubPagoController extends PublicBaseController
             return response()->json(['codigo' => 2, 'message' => 'Origen Desconocido'], 403);
         }
 
+        $request->validate([
+            'referencia'  => 'required|string|max:100',
+            'monto'       => 'required|numeric|min:1',
+            'transaccion' => 'required|string|max:100',
+        ]);
+
         $referencia = $request->input('referencia');
         $ref = ClubPagoReference::where('reference', $referencia)->first();
 
@@ -58,7 +65,7 @@ class ClubPagoController extends PublicBaseController
             return $this->jsonResponse(13, 0, 0, 'Referencia Sin Adeudo o Cancelada', $referencia);
         }
 
-        $montoRecibido = $request->input('monto') / 100;
+        $montoRecibido = (float) $request->input('monto') / 100;
         if ($montoRecibido != $ref->amount) {
             return $this->jsonResponse(30, 0, 0, 'Monto Inválido', $referencia);
         }
@@ -70,7 +77,7 @@ class ClubPagoController extends PublicBaseController
 
         app(OrderService::class)->confirmOrder($order);
 
-        $autorizacion = rand(10000000, 99999999);
+        $autorizacion = random_int(10000000, 99999999);
         $transaccion  = $request->input('transaccion');
 
         $ref->update(['authorization' => $autorizacion, 'status' => 'paid']);
@@ -89,6 +96,11 @@ class ClubPagoController extends PublicBaseController
             return response()->json(['codigo' => 2, 'message' => 'Origen Desconocido'], 403);
         }
 
+        $request->validate([
+            'referencia'   => 'required|string|max:100',
+            'autorizacion' => 'required|string|max:50',
+        ]);
+
         $referencia   = $request->input('referencia');
         $autorizacion = $request->input('autorizacion');
         $ref = ClubPagoReference::where('reference', $referencia)->first();
@@ -101,7 +113,7 @@ class ClubPagoController extends PublicBaseController
             return $this->jsonSimple(0, 'Cancelación Exitosa');
         }
 
-        if ($ref->authorization != $autorizacion) {
+        if (!hash_equals((string) $ref->authorization, (string) $autorizacion)) {
             return $this->jsonSimple(61, 'Cancelación Fallida');
         }
 
@@ -110,7 +122,7 @@ class ClubPagoController extends PublicBaseController
             app(OrderService::class)->cancelOrder($order);
         }
 
-        $ref->update(['status' => 'pending']);
+        $ref->update(['status' => 'cancelled']);
         return $this->jsonSimple(0, 'Cancelación Exitosa');
     }
 
@@ -213,18 +225,18 @@ class ClubPagoController extends PublicBaseController
 
     private function verificaHeader(Request $request): string
     {
-        $xOrigin   = base64_encode(\Settings::get('payment_clubpago_x_origin'));
-        $userAgent = \Settings::get('payment_clubpago_user_agent');
+        $xOrigin   = base64_encode((string) \Settings::get('payment_clubpago_x_origin'));
+        $userAgent = (string) \Settings::get('payment_clubpago_user_agent');
 
         if (!$request->hasHeader('X-Origin') || !$request->hasHeader('User-Agent')) {
             return '401';
         }
 
-        if ($xOrigin !== $request->header('X-Origin')) {
+        if (!hash_equals($xOrigin, (string) $request->header('X-Origin'))) {
             return '401';
         }
 
-        if ($userAgent !== $request->header('User-Agent')) {
+        if (!hash_equals($userAgent, (string) $request->header('User-Agent'))) {
             return '403';
         }
 
