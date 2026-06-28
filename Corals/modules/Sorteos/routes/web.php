@@ -12,7 +12,7 @@ Route::post('sorteo/{slug}/comprar', 'PublicSorteoController@checkout')->name('s
 
 // Admin routes — specific literal paths first, resource catch-alls last.
 Route::group(['prefix' => 'sorteos'], function () {
-    Route::resource('boletos', 'BoletosController')->parameters(['boletos' => 'boleto'])->only(['index', 'show']);
+    Route::resource('boletos', 'BoletosController')->parameters(['boletos' => 'boleto'])->only(['index', 'show', 'edit', 'update']);
     Route::get('boletos/create', fn() => redirect(url('sorteos/carteras/create'))->with('info', 'Los boletos se generan automáticamente al crear una cartera.'))->name('sorteos.boletos.create');
     Route::get('boletos/{boleto}/pdf', 'BoletosController@download')->name('sorteos.boletos.pdf');
 

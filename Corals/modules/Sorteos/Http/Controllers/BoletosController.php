@@ -45,6 +45,32 @@ class BoletosController extends BaseController
         return view('Sorteos::boletos.show')->with(compact('boleto'));
     }
 
+    public function edit(BoletoRequest $request, Boleto $boleto)
+    {
+        $this->setViewSharedData([
+            'title_singular' => trans('Corals::labels.update_title', ['title' => $boleto->getIdentifier()]),
+        ]);
+
+        $statuses = collect(\Corals\Modules\Sorteos\Enums\BoletoStatus::cases())
+            ->mapWithKeys(fn($c) => [$c->value => $c->label()])
+            ->all();
+
+        return view('Sorteos::boletos.create_edit')->with(compact('boleto', 'statuses'));
+    }
+
+    public function update(BoletoRequest $request, Boleto $boleto)
+    {
+        $data = $request->validate([
+            'status'          => 'required|in:available,reserved,sold',
+            'physical_number' => 'required|integer|min:1',
+        ]);
+
+        $boleto->update($data);
+
+        return redirect()->to($boleto->getShowURL())
+            ->with('success', 'Boleto actualizado correctamente.');
+    }
+
     public function download(BoletoRequest $request, Boleto $boleto)
     {
         $boleto->loadMissing(['sorteo', 'cartera']);
